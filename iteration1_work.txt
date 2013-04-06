@@ -1,0 +1,6 @@
+Names: Frank Bi, Li Yi
+Class/Section: CSci 3081W, 
+
+Frank Bi worked on scanner.cpp, wrote this file, set up the file structure and created .gitignore. He will finish scanner.cpp before working on the next iteration. 
+
+Li Yi worked on the test cases in scanner_tests.h

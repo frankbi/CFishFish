@@ -1,0 +1,6 @@
+CSCI 3081W
+Frank Bi #3804098
+Michael Cistera #4352091
+Li Yi
+
+Frank and Michael worked on the Makefile, taged iteration 2, and we resolved compiling errors from our code.
