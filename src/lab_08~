@@ -1,0 +1,21 @@
+Q1: Is there any duplication in the testing code you've written to test individual token regular expressions and the code used by scan?
+
+A1: 
+
+Q2: Does your scan function makes calls to makeRegex every time it is called?
+
+A2: 
+
+Q3: Do you have a reundant array of tokenType values? The data in this array is useless. Why is that?
+
+A3:
+
+Q4: Would changing the order of nameKwd and exitKwd in the definition of enum tokenEnumType in scanner.h have any adverse effect on the rest of your code? If so, what changes should be made to prevent this from happening?
+
+A4: 
+
+Q5: Do you create a named regex_t pointer for each regex instead of only putting them in an array? Are these necessary? Can you get rid of these?
+
+A5:
+
+Q6: Are there any places in which enumerated tokenType values should be used instead of integer literals? For example, do you ever use the constant 8 to identiy the integer keyword in some way? If so, can you get ride of these?

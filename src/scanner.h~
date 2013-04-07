@@ -40,6 +40,7 @@ enum tokenEnumType {
     // Special terminal types
     endOfFile , //38
     lexicalError, //39
+
 } ;
 
 enum whitespaceRegexType {

@@ -76,7 +76,7 @@ Token* Scanner::scan(const char* text) {
 // expanding the vector with zeroes if necessary
 // When calling, use an enumerated type for index and the order of the enum will no longer matter
 void add_regex(vector<regex_t*>& regexvec, unsigned int index, const char* regex_string) {
-    if (index + 1 > regexvec.size()) { // if the vector is not large enough resize it
+    if (index + 1 > regexvec.size()) { //if the vector is not large enough resize it
         regexvec.resize(index + 1);
     }
     regexvec[index] = makeRegex(regex_string);

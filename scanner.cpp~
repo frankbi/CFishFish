@@ -25,8 +25,9 @@ Token::Token(tokenType terminal, Token* next, std::string lexeme) {
     this->lexeme = lexeme;
 }
 
-// argument text is the source file read into a char buffer
-// returns the first in a chain of tokens
+
+//argument text is the source file read into a char buffer
+//returns the first in a chain of tokens
 Token* Scanner::scan(const char* text) {
     int len = strlen(text);
     int i = consume_white_space_and_comments(text);
@@ -36,7 +37,7 @@ Token* Scanner::scan(const char* text) {
     if (start != NULL) {
         i += start->lexeme.length();
     } else {
-        i = len; // to skip to the end and just return an end of file if the string is all whitespace
+        i = len; // to skip to the end and just return an end of file is the string is all whitespace
     }
     
     Token* prev = start;
@@ -76,13 +77,13 @@ Token* Scanner::scan(const char* text) {
 // expanding the vector with zeroes if necessary
 // When calling, use an enumerated type for index and the order of the enum will no longer matter
 void add_regex(vector<regex_t*>& regexvec, unsigned int index, const char* regex_string) {
-    if (index + 1 > regexvec.size()) { // if the vector is not large enough resize it
+    if (index + 1 > regexvec.size()) { //if the vector is not large enough resize it
         regexvec.resize(index + 1);
     }
     regexvec[index] = makeRegex(regex_string);
 }
 
-void Scanner::initialize_regex() {
+void Scanner::initialize_regex(){
     add_regex(regexes, nameKwd, "^name");
     add_regex(regexes, platformKwd, "^platform");
     add_regex(regexes, initialKwd, "^initial");
@@ -129,21 +130,23 @@ void Scanner::initialize_regex() {
     add_regex(regexes, greaterThanEquals, "^>=");
     add_regex(regexes, notEquals, "^!=");
 
+
     add_regex(whitespace_regexes, whitespace, "^[\n\t\r ]+");
     add_regex(whitespace_regexes, blockComment, "^/\\*([^\\*]|\\*+[^\\*/])*\\*+/");
     add_regex(whitespace_regexes, lineComment, "^//[^\n\r]+");
+
 }
 
 
-// Make a token from start of text to the last character before a delimiter
-// Must consume whitespace before call to function
+// make a token from start of text to the last character before a delimiter
 Token* Scanner::make_token(const char* text) {
+//    cout << "Make token: " << text << "|||\n";
+// must consume whitespace beforehand
     if (strlen(text) == 0) {
         return NULL;
     }
     Token* longest_match = new Token(lexicalError, NULL, text);
-    int max_len = 0; 
-    int cur_match_len = 0;
+    int max_len = 0; int cur_match_len = 0;
     for (unsigned int t = 0; t < regexes.size(); t++) {
         if ( (cur_match_len = matchRegex(regexes[t], text)) ) {
             if (cur_match_len > max_len) { //found a longer match
@@ -152,17 +155,18 @@ Token* Scanner::make_token(const char* text) {
             }
         }
     }
-    if (longest_match->terminal == lexicalError) {
+    if(longest_match->terminal == lexicalError) {
         max_len = 1;
     }
     longest_match->lexeme.erase(max_len, string::npos); // erase all parts of the lexeme after the match
+
     return longest_match;
 }
 
-// Return true for success
+//return true for success
 bool Scanner::make_token_tester(const char* text, tokenType t, const char* lexeme) {
-    // Match token in text
-    // Verify that returned token type is type t and lexeme matches
+    //match token in text
+    //verify that returned token type is type t and lexeme matches
     Token* tok = make_token(text);
     if (tok == NULL) {
         return false;
@@ -174,11 +178,10 @@ bool Scanner::make_token_tester(const char* text, tokenType t, const char* lexem
     return true;
 }
 
-// Returns number of characters consumed
+//returns number of characters consumed
 int Scanner::consume_white_space_and_comments(const char* text) {
     const char* cur_pos = text;
-    int ret = 0; 
-    int cur_matched = 0;
+    int ret = 0; int cur_matched = 0;
     bool matched = true;
     while (matched) { //continue until no matched left
         matched = false;
