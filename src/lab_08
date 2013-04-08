@@ -2,9 +2,9 @@ Q1: Is there any duplication in the testing code you've written to test individu
 
 A1: 
 
-Q2: Does your scan function makes calls to makeRegex every time it is called?
+Q2: Does your scan function make calls to makeRegex every time it is called?
 
-A2: 
+A2: The scan function does not make calls to makeRegex every time it is called.
 
 Q3: Do you have a reundant array of tokenType values? The data in this array is useless. Why is that?
 

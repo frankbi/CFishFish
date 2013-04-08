@@ -9,6 +9,7 @@
 
 using namespace std;
 
+// Initialize Scanner
 Scanner::Scanner() {
     initialize_regex();
 }
