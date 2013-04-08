@@ -49,6 +49,8 @@ public:
     ParseResult parseType () ;
     ParseResult parseStates () ;
     ParseResult parseState () ;
+    
+    
     ParseResult parseTransitions () ;
     ParseResult parseTransition () ;
     ParseResult parseStmts () ;

@@ -1,0 +1,4 @@
+Division of Work Statement for Writing Assignment 1
+By Frank Bi (#3804098) and Michael Cistera (#4352091)
+
+Because only had one change necessary, Michael fixed the code for problem 4. Michael and Frank worked on the writing portion, division of work statement, and tagging together.

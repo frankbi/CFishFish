@@ -53,7 +53,7 @@ public:
     
     ParseResult parseTransitions () ;
     ParseResult parseTransition () ;
-    ParseResult parseStmts () ;
+    ParseResult parseStmts () ; // Collect statements instead of using a list
     ParseResult parseStmt () ;
     ParseResult parseExpr (int rbp) ;
 
