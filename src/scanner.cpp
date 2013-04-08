@@ -32,24 +32,25 @@ Token* Scanner::scan(const char* text) {
     int len = strlen(text);
     int i = consume_white_space_and_comments(text);
     Token * start;
-    start = make_token(text + i);
+    start = make_token(text + i); // i is where the offset is from where the current text starts
+	// make_token will produce one toke -- one token from the start of the text it gets.
     
     if (start != NULL) {
-        i += start->lexeme.length();
+        i += start->lexeme.length(); // moves on to the next type
     } else {
         i = len; // to skip to the end and just return an end of file if the string is all whitespace
     }
     
     Token* prev = start;
     
-    while (i < len) {
+    while (i < len) { // goes through the whole text, matching as much as it can. When it cna't match anymore, it makes a token.
+	// you only break out of this loop when you're done with the file.
         int x;
         if ( (x = consume_white_space_and_comments(text + i)) == 0) {
                 Token* t = make_token(text + i);
                 if (t == NULL) {
                     break;
                 }
-                //cout << "made token " << t->terminal << " " << t->lexeme << endl;
                 if (prev != NULL) {
                     prev->next = t;
                 }
@@ -60,6 +61,7 @@ Token* Scanner::scan(const char* text) {
         }
     }
 
+	stick end file at the end.
     Token * end = new Token(endOfFile, NULL, "");
     if (prev != NULL) {
         prev->next = end;
@@ -74,7 +76,8 @@ Token* Scanner::scan(const char* text) {
 
 
 // Takes a regex string, makes the regex, and inserts it into slot index of regexvec, 
-// expanding the vector with zeroes if necessary
+// expanding the vector with zeroes if necessarame: ABStar ;
+platform: RegexRey
 // When calling, use an enumerated type for index and the order of the enum will no longer matter
 void add_regex(vector<regex_t*>& regexvec, unsigned int index, const char* regex_string) {
     if (index + 1 > regexvec.size()) { // if the vector is not large enough resize it
@@ -144,7 +147,8 @@ Token* Scanner::make_token(const char* text) {
     }
     Token* longest_match = new Token(lexicalError, NULL, text);
     int max_len = 0; 
-    int cur_match_len = 0;
+    int cur_match_len = 0;ame: ABStar ;
+platform: RegexRe
     for (unsigned int t = 0; t < regexes.size(); t++) {
         if ( (cur_match_len = matchRegex(regexes[t], text)) ) {
             if (cur_match_len > max_len) { //found a longer match
