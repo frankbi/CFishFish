@@ -9,10 +9,10 @@
    Precedence", presented at the ACM Symposium on Principles of
    Programming Languages.
 
-   Douglas Crockford's chapter is available at 
+   Douglas Crockford's chapter is available at
     http://javascript.crockford.com/tdop/tdop.html
 
-   Vaughan Pratt's paper is available at 
+   Vaughan Pratt's paper is available at
     http://portal.acm.org/citation.cfm?id=512931
 
    These are both quite interesting works and worth reading if you
@@ -27,9 +27,11 @@
 #include "scanner.h"
 #include "parseResult.h"
 
+
 #include <string>
 
-class ExtToken ;
+
+class ExtToken;
 
 class Parser {
 
@@ -49,8 +51,8 @@ public:
     ParseResult parseType () ;
     ParseResult parseStates () ;
     ParseResult parseState () ;
-    
-    
+
+
     ParseResult parseTransitions () ;
     ParseResult parseTransition () ;
     ParseResult parseStmts () ; // Collect statements instead of using a list

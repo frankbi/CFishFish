@@ -10,7 +10,7 @@
 
 using namespace std ;
 
-class ParserTestSuite : public CxxTest::TestSuite 
+class ParserTestSuite : public CxxTest::TestSuite
 {
 public:
     Scanner *s ;
@@ -21,8 +21,8 @@ public:
     }
 
     void test_parse_bad_syntax ( ) {
-        const char *text 
-          = readInputFromFile ( "../samples/bad_syntax_good_tokens.stm" )  ;
+        const char *text
+          = readInputFromFile ( "../samples/bad_syntax_good_tokens.cff" )  ;
         TS_ASSERT ( text ) ;
         ParseResult pr = p->parse ( text ) ;
         TS_ASSERT ( ! pr.ok ) ;
@@ -30,9 +30,9 @@ public:
 
     void test_parse_exprs ( ) {
         ostringstream prog ;
-        prog << "name: N ; " << endl 
-             << "platform: P ; " << endl 
-             << "state: S { " << endl 
+        prog << "name: N ; " << endl
+             << "platform: P ; " << endl
+             << "state: S { " << endl
              << "  goto S when b <= 10 performing { " << endl
              << "    x := 1 + 2 * 3 ; " << endl
              << "    y := x / 4 - 2 ; " << endl
@@ -49,30 +49,30 @@ public:
     }
 
     void test_parse_abstar ( ) {
-        const char *filename = "../samples/abstar.stm" ;
+        const char *filename = "../samples/abstar.cff" ;
         const char *text = readInputFromFile ( filename )  ;
         TS_ASSERT ( text ) ;
         ParseResult pr = p->parse ( text ) ;
         string msg (filename) ;
-        msg += "\n" + pr.errors + "\n" + pr.pp ;
+        msg += "\n" + pr.errors ;
         TSM_ASSERT ( msg , pr.ok );
     }
     void test_parse_box ( ) {
-        const char *filename = "../samples/box.stm" ;
+        const char *filename = "../samples/box.cff" ;
         const char *text = readInputFromFile ( filename )  ;
         TS_ASSERT ( text ) ;
         ParseResult pr = p->parse ( text ) ;
         string msg (filename) ;
-        msg += "\n" + pr.errors + "\n" + pr.pp ;
+        msg += "\n" + pr.errors ;
         TSM_ASSERT ( msg , pr.ok );
     }
     void test_parse_sumOfSquares ( ) {
-        const char *filename = "../samples/sumOfSquares.stm" ;
+        const char *filename = "../samples/sumOfSquares.cff" ;
         const char *text = readInputFromFile ( filename )  ;
         TS_ASSERT ( text ) ;
         ParseResult pr = p->parse ( text ) ;
         string msg (filename) ;
-        msg += "\n" + pr.errors + "\n" + pr.pp ;
+        msg += "\n" + pr.errors ;
         TSM_ASSERT ( msg , pr.ok );
     }
 

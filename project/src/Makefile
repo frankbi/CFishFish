@@ -23,11 +23,15 @@ parseResult.o:  parseResult.cpp parseResult.h
 extToken.o: extToken.cpp extToken.h scanner.h parser.h
 	g++ $(FLAGS) -c extToken.cpp
 
+ast.o: ast.cpp ast.h
+	g++ $(FLAGS) -c ast.cpp
+
 # Testing files and targets.
-run-tests:	regex_tests scanner_tests parser_tests
+run-tests:	regex_tests scanner_tests parser_tests ast_tests
 	./regex_tests
 	./scanner_tests
 	./parser_tests
+	./ast_tests
 
 regex_tests:	regex_tests.cpp regex.o
 	g++ $(FLAGS) -I$(CXX_DIR) -o regex_tests regex.o regex_tests.cpp
@@ -44,16 +48,24 @@ scanner_tests.cpp:	scanner.o scanner_tests.h readInput.h
 	$(CXXTEST) $(CXXFLAGS) -o scanner_tests.cpp scanner_tests.h
 
 
-parser_tests:	parser_tests.cpp parser.o parseResult.o readInput.o scanner.o extToken.o regex.o
+parser_tests:	parser_tests.cpp parser.o parseResult.o readInput.o scanner.o extToken.o regex.o ast.o
 	g++ $(FLAGS) -I$(CXX_DIR) -o parser_tests \
-		parser.o parseResult.o readInput.o scanner.o extToken.o regex.o parser_tests.cpp
+		parser.o parseResult.o readInput.o scanner.o extToken.o regex.o ast.o parser_tests.cpp
 
-parser_tests.cpp:   parser.o parser_tests.h parser.h parseResult.h readInput.h scanner.h extToken.h
+parser_tests.cpp:   parser.o parser_tests.h parser.h parseResult.h readInput.h scanner.h extToken.h ast.h
 	$(CXXTEST) $(CXXFLAGS) -o parser_tests.cpp parser_tests.h
+
+ast_tests: ast_tests.cpp readInput.o scanner.o extToken.o parseResult.o parser.o regex.o ast.o
+	g++ $(FLAGS) -I$(CXX_DIR) -o ast_tests \
+		readInput.o scanner.o extToken.o parseResult.o parser.o regex.o ast.o ast_tests.cpp
+
+ast_tests.cpp: ast_tests.h readInput.o scanner.o extToken.o parser.o parseResult.o
+	$(CXXTEST) $(CXXFLAGS) -o ast_tests.cpp ast_tests.h
 
 
 clean:
 	rm -Rf *.o \
 		regex_tests regex_tests.cpp \
 		scanner_tests scanner_tests.cpp \
-		parser_tests parser_tests.cpp
+		parser_tests parser_tests.cpp \
+		ast_tests ast_tests.cpp

@@ -5,7 +5,7 @@ platform: IntegerComputer ;
 
 /* i := 0 ;
    s := 0 ;
-   while i < input do
+   while i <= input do // fixed. was incorrectly i<input before
      s := s + i * i ;
      i := i + 1 ;
    end 

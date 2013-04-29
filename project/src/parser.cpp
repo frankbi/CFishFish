@@ -9,10 +9,10 @@
    Precedence", presented at the ACM Symposium on Principles of
    Programming Languages.
 
-   Douglas Crockford's chapter is available at 
+   Douglas Crockford's chapter is available at
     http://javascript.crockford.com/tdop/tdop.html
 
-   Vaughan Pratt's paper is available at 
+   Vaughan Pratt's paper is available at
     http://portal.acm.org/citation.cfm?id=512931
 
    These are both quite interesting works and worth reading if you
@@ -21,15 +21,32 @@
    Last modified: March 5, 2013.
 */
 
+/*
+
+    So that we did not have to implement everything before being able to run tests on the parser,
+    we created dummy objects in each parse function with a constructor that took no arguments. This
+    way running the tests would not result in a segmentation fault as a higher-level parse function
+    attempted to call dynamic_cast on a NULL pointer.
+
+    We wrote the parse functions from top to bottom, starting with Program and ending with the subclasses
+    of Expr and BinOp. Because we created dummy objects in the lower-level parse functions, our parser
+    could successfully return a Program and our tests could call getName() or getNumVarUses() on it before
+    we wrote anything else, they just would not necessarily return the right value.
+
+*/
+
 #include "parser.h"
 #include "scanner.h"
 #include "extToken.h"
-
-#include <assert.h>
+#include "ast.h"
+#include <cassert>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 using namespace std ;
 
-Parser::Parser ( ) { } 
+Parser::Parser ( ) { }
 
 ParseResult Parser::parse (const char *text) {
     assert (text != NULL) ;
@@ -51,28 +68,60 @@ ParseResult Parser::parse (const char *text) {
     return pr ;
 }
 
-/* 
+/*
  * parse methods for non-terminal symbols
  * --------------------------------------
  */
-
 
 // Program
 ParseResult Parser::parseProgram () {
     ParseResult pr ;
 
     // Program ::= nameKwd colon variableName semiColon Platform Decls States
+
     match(nameKwd) ;
     match(colon) ;
     match(variableName) ;
+
+    string s(prevToken->lexeme);
     match(semiColon) ;
-    parsePlatform() ;
-    parseDecls() ;
-    parseStates() ;
+
+    ParseResult platform_result = parsePlatform() ;
+
+    Platform* plat = dynamic_cast<Platform*>(platform_result.ast); // will segfault because parsePlatform is not yet implemented, the returned parseResult's AST pointer will be NULL
+    //assert(plat != NULL);
+    if (plat == NULL) cout << "Platform NULL\n";
+
+    ParseResult decls_result = parseDecls() ;
+    Decls* decl = dynamic_cast<Decls*>(decls_result.ast);
+    assert(decl != NULL);
+
+    vector<State*>* states = new vector<State*>;
+    while(!nextIs(endOfFile)){
+        ParseResult curstate = parseState();
+        State* current = dynamic_cast<State*>(curstate.ast);
+        states->push_back(current);
+    }
+    /*ParseResult states_result = parseStates() ;
+    States* state = dynamic_cast<States*>(states_result.ast);
+    assert(state != NULL);*/
+
+
+
+
+
+    Program* p = new Program(s, plat, decl, states);
+
     match(endOfFile) ;
+
+	// put Program p into parseResult
+	// TODO: error strings
+	pr.ast = (Node*)p;
+	pr.ok = true;
 
     return pr ;
 }
+
 
 // Platform
 ParseResult Parser::parsePlatform () {
@@ -82,10 +131,17 @@ ParseResult Parser::parsePlatform () {
     match(platformKwd) ;
     match(colon) ;
     match(variableName) ;
+    string s(prevToken->lexeme);
+
     match(semiColon) ;
+
+    Platform* p = new Platform(s);
+    pr.ast = (Node*)p;
+    pr.ok = true;
 
     return pr ;
 }
+
 
 
 // Decls
@@ -94,76 +150,114 @@ ParseResult Parser::parseDecls () {
 
     if ( ! nextIs(initialKwd) && ! nextIs(stateKwd) ) {
         // Decls ::= Decl Decls
-        parseDecl() ;
-        parseDecls() ;
+
+       ParseResult parse_decl = parseDecl() ;
+       Decl* left =  dynamic_cast<Decl*>(parse_decl.ast);
+       ParseResult parse_decls = parseDecls() ;
+       Decls* right = dynamic_cast<Decls*>(parse_decls.ast);
+       Decls* p = new Decls(left, right);
+
+       pr.ast = p;
+
     }
     else {
-        // Decls ::= 
+        // Decls ::=
         // nothing to match.
-    }
+        Decls* em = new Decls();
+        pr.ast = em;
 
+    }
+       pr.ok = true;
     return pr ;
 }
-
 
 // Decl
 ParseResult Parser::parseDecl () {
     ParseResult pr ;
     // Decl ::= Type variableName semiColon
-    parseType() ;
+    ParseResult parse_type = parseType() ;
+    Type* t = dynamic_cast<Type*>(parse_type.ast);
+
+    assert (dec != NULL);
+
     match(variableName) ;
+    string s(prevToken->lexeme);
+
     match(semiColon) ;
+
+    Decl* p = new Decl(*t, s);
+    pr.ast = p;
+    pr.ok = true;
+
     return pr ;
 }
+
 
 // Type
 ParseResult Parser::parseType () {
     ParseResult pr ;
-
+    Type* t;
     if ( attemptMatch(intKwd) ) {
         // Type ::= intKwd
-    } 
+        t = new Type(Int);
+    }
     else if ( attemptMatch(floatKwd) ) {
         // Type ::= floatKwd
+        t = new Type(Float);
     }
     else if ( attemptMatch(booleanKwd) ) {
         // Type ::= booleanKwd
+        t = new Type(Boolean);
     }
     else if ( attemptMatch(stringKwd) ) {
         // Type ::= stringKwd
+        t = new Type(String);
     }
     else {
         // Type ::= charKwd
         match(charKwd) ;
+        t = new Type(Char);
     }
+
+    pr.ast = (Node*)t;
     return pr ;
 }
 
 
 // States
+/*
 ParseResult Parser::parseStates () {
     ParseResult pr ;
 
     if ( ! nextIs(endOfFile) ) {
         // States ::= State States
-        parseState() ;
-        parseStates() ;
+        ParseResult parse_state = parseState() ;
+        State* left = dynamic_cast<State*>(parse_state.ast);
+        ParseResult parse_states = parseStates() ;
+        States* right = dynamic_cast<States*>(parse_states.ast);
+        States* p = new States(left, right);
+
+        pr.ast = p;
     }
     else {
-        // States ::= 
+        // States ::=
         // nothing to match.
+        States* em = new States();
+        pr.ast = em;
     }
+
+    pr.ok = true;
     return pr ;
-}
+}*/
 
 
 // State
 ParseResult Parser::parseState () {
     ParseResult pr ;
 
-    // State ::= stateKwd colon variableName 
+    // State ::= stateKwd colon variableName
     //           leftCurly Transitions rightCurly
-    // State ::= initialKwd stateKwd colon variableName 
+    // State ::= initialKwd stateKwd colon variableName
     //           leftCurly Transitions rightCurly
 
     bool isInitial ;
@@ -171,6 +265,7 @@ ParseResult Parser::parseState () {
         isInitial = true ;
     }
     else {
+
         isInitial = false ;
     }
 
@@ -178,8 +273,13 @@ ParseResult Parser::parseState () {
     match(colon) ;
     match(variableName) ;
     match(leftCurly) ;
-    parseTransitions() ;
+
+    ParseResult parse_transitions = parseTransitions() ;
+    Transitions* tran = dynamic_cast<Transitions*>(parse_transitions.ast);
     match(rightCurly) ;
+    State* p = new State(tran);
+    pr.ast = p;
+    pr.ok = true;
 
     return pr ;
 
@@ -193,9 +293,12 @@ ParseResult Parser::parseState () {
        common suffix.  Neither approach is always better than the
        other.  It depends primarily on what we want to do with the
        parsed code. We will see this in iteration 3 when we build
-       abstract syntax trees. 
+       abstract syntax trees.
      */
 }
+
+
+
 
 
 /* ----------------------------------------------------------- */
@@ -204,17 +307,23 @@ ParseResult Parser::parseState () {
 // Transitions
 ParseResult Parser::parseTransitions () {
     ParseResult pr ;
-
+    Transitions* t;
     if ( ! nextIs(rightCurly) ) {
         // Transitions ::= Transition Transitions
-        parseTransition() ;
-        parseTransitions() ;
+        ParseResult tran_result = parseTransition();
+        Transition* tran = dynamic_cast<Transition*>(tran_result.ast);
+        ParseResult next_result = parseTransitions() ;
+        Transitions* next =  dynamic_cast<Transitions*>(next_result.ast);
+        t = new Transitions(tran, next);
+
     }
     else {
-        // Transitions ::= 
+        // Transitions ::=
         // nothing to match.
+        t = new Transitions();
     }
 
+    pr.ast = (Node*)t;
     return pr ;
 }
 
@@ -222,33 +331,40 @@ ParseResult Parser::parseTransitions () {
 // Transition
 ParseResult Parser::parseTransition () {
     ParseResult pr ;
-
+    Transition* t;// = new Transition();
     if ( nextIs(gotoKwd) ) {
-        // Transition ::= gotoKwd variableName whenKwd Expr 
+        // Transition ::= gotoKwd variableName whenKwd Expr
         //                performingKwd leftCurly Stmts rightCurly semiColon
         match(gotoKwd) ;
         match(variableName) ;
+        string toGoto(prevToken->lexeme);
         match(whenKwd) ;
-        parseExpr(0) ;
+        ParseResult expr_result = parseExpr(0);
+        Expr* expr = dynamic_cast<Expr*>(expr_result.ast);
         match(performingKwd) ;
         match(leftCurly) ;
-        parseStmts() ;
+        ParseResult statements_result = parseStmts() ;
+        Stmts* statements = dynamic_cast<Stmts*>(statements_result.ast);
         match(rightCurly) ;
         match(semiColon) ;
+        t = new Transition(toGoto, statements, expr);
     }
     else {
-        // Transition ::= exitKwd whenKwd Expr 
+        // Transition ::= exitKwd whenKwd Expr
         //                performingKwd leftCurly Stmts rightCurly semiColon
         match(exitKwd) ;
         match(whenKwd) ;
-        parseExpr(0) ;
+        ParseResult expr_result = parseExpr(0) ;
+        Expr* expr = dynamic_cast<Expr*>(expr_result.ast);
         match(performingKwd) ;
         match(leftCurly) ;
-        parseStmts() ;
+        ParseResult statements_result = parseStmts() ;
+        Stmts* statements = dynamic_cast<Stmts*>(statements_result.ast);
         match(rightCurly) ;
         match(semiColon) ;
+        t = new Transition(statements, expr);
     }
-
+    pr.ast = (Node*)t;
     return pr ;
 }
 
@@ -256,16 +372,22 @@ ParseResult Parser::parseTransition () {
 // Stmts
 ParseResult Parser::parseStmts () {
     ParseResult pr ;
+    Stmts* statements;
 
     if ( ! nextIs(rightCurly) ) {
         // Stmts ::= Stmt Stmts
-        parseStmt() ;
-        parseStmts() ;
+        ParseResult left_result = parseStmt() ;
+        Stmt* left = dynamic_cast<Stmt*>(left_result.ast);
+        ParseResult right_result = parseStmts() ;
+        Stmts* right = dynamic_cast<Stmts*>(right_result.ast);
+        statements = new Stmts(left, right);
     }
     else {
-        // Stmts ::= 
+        // Stmts ::=
         // nothing to match.
+        statements = new Stmts();
     }
+    pr.ast = (Node*)statements;
     return pr ;
 }
 
@@ -276,10 +398,13 @@ ParseResult Parser::parseStmt () {
 
     // Stmt ::= variableName assign Expr semiColon
     match(variableName) ;
+    VariableUse* v = new VariableUse(prevToken->lexeme);
     match(assign) ;
-    parseExpr(0) ;
+    ParseResult expr_result = parseExpr(0) ;
+    Expr* expr = dynamic_cast<Expr*>(expr_result.ast);
     match(semiColon) ;
-
+	Stmt* s = new Stmt(expr, v);
+    pr.ast = (Node*)s;
     return pr ;
 }
 
@@ -290,7 +415,7 @@ ParseResult Parser::parseExpr (int rbp) {
        'led' methods that are dispatchers that call the appropriate
        parse methods.*/
     ParseResult left = currToken->nud() ;
-   
+
     while (rbp < currToken->lbp() ) {
         left = currToken->led(left) ;
     }
@@ -308,6 +433,7 @@ ParseResult Parser::parseExpr (int rbp) {
 ParseResult Parser::parseTrueKwd ( ) {
     ParseResult pr ;
     match ( trueKwd ) ;
+    pr.ast = new BoolConst(true);
     return pr ;
 }
 
@@ -315,6 +441,7 @@ ParseResult Parser::parseTrueKwd ( ) {
 ParseResult Parser::parseFalseKwd ( ) {
     ParseResult pr ;
     match ( falseKwd ) ;
+    pr.ast = new BoolConst(false);
     return pr ;
 }
 
@@ -322,6 +449,9 @@ ParseResult Parser::parseFalseKwd ( ) {
 ParseResult Parser::parseIntConst ( ) {
     ParseResult pr ;
     match ( intConst ) ;
+    int x;
+    istringstream(prevToken->lexeme) >> x;
+    pr.ast = new IntConst(x);
     return pr ;
 }
 
@@ -329,6 +459,9 @@ ParseResult Parser::parseIntConst ( ) {
 ParseResult Parser::parseFloatConst ( ) {
     ParseResult pr ;
     match ( floatConst ) ;
+    float x;
+    istringstream(prevToken->lexeme) >>x;
+    pr.ast = new FloatConst(x);
     return pr ;
 }
 
@@ -336,6 +469,7 @@ ParseResult Parser::parseFloatConst ( ) {
 ParseResult Parser::parseStringConst ( ) {
     ParseResult pr ;
     match ( stringConst ) ;
+    pr.ast = (Node*)new StringConst(prevToken->lexeme);
     return pr ;
 }
 
@@ -343,6 +477,7 @@ ParseResult Parser::parseStringConst ( ) {
 ParseResult Parser::parseCharConst ( ) {
     ParseResult pr ;
     match ( charConst ) ;
+    pr.ast = (Node*)new CharConst(prevToken->lexeme[1]);
     return pr ;
 }
 
@@ -350,6 +485,7 @@ ParseResult Parser::parseCharConst ( ) {
 ParseResult Parser::parseVariableName ( ) {
     ParseResult pr ;
     match ( variableName ) ;
+    pr.ast = (Node*)new VariableUse();
     return pr ;
 }
 
@@ -358,52 +494,73 @@ ParseResult Parser::parseVariableName ( ) {
 ParseResult Parser::parseNestedExpr ( ) {
     ParseResult pr ;
     match ( leftParen ) ;
-    parseExpr(0) ; 
+    pr = parseExpr(0) ;
     match(rightParen) ;
     return pr ;
 }
 
 // Expr ::= Expr plusSign Expr
 ParseResult Parser::parseAddition ( ParseResult left ) {
-    // parser has already matched left expression 
+    // parser has already matched left expression
     ParseResult pr ;
 
     match ( plusSign ) ;
-    parseExpr( prevToken->lbp() ); 
+    ParseResult right = parseExpr( prevToken->lbp() );
+    Expr *leftexpr, *rightexpr;
+    leftexpr = dynamic_cast<Expr*>(left.ast);
+    rightexpr = dynamic_cast<Expr*>(right.ast);
 
+    Plus* p = new Plus(leftexpr, rightexpr);
+    pr.ast = (Node*)p;
     return pr ;
 }
 
 // Expr ::= Expr star Expr
 ParseResult Parser::parseMultiplication ( ParseResult left ) {
-    // parser has already matched left expression 
+    // parser has already matched left expression
     ParseResult pr ;
 
     match ( star ) ;
-    parseExpr( prevToken->lbp() ); 
+    ParseResult right = parseExpr( prevToken->lbp() );
+    Expr *leftexpr, *rightexpr;
+    leftexpr = dynamic_cast<Expr*>(left.ast);
+    rightexpr = dynamic_cast<Expr*>(right.ast);
 
+
+    Mul* m = new Mul(leftexpr, rightexpr);
+    pr.ast = (Node*)m;
     return pr ;
 }
 
 // Expr ::= Expr dash Expr
 ParseResult Parser::parseSubtraction ( ParseResult left ) {
-    // parser has already matched left expression 
+    // parser has already matched left expression
     ParseResult pr ;
 
     match ( dash ) ;
-    parseExpr( prevToken->lbp() ); 
+    ParseResult right = parseExpr( prevToken->lbp() );
+    Expr *leftexpr, *rightexpr;
+    leftexpr = dynamic_cast<Expr*>(left.ast);
+    rightexpr = dynamic_cast<Expr*>(right.ast);
 
+    Minus* m = new Minus(leftexpr, rightexpr);
+    pr.ast = (Node*)m;
     return pr ;
 }
 
 // Expr ::= Expr forwardSlash Expr
 ParseResult Parser::parseDivision ( ParseResult left ) {
-    // parser has already matched left expression 
+    // parser has already matched left expression
     ParseResult pr ;
 
     match ( forwardSlash ) ;
-    parseExpr( prevToken->lbp() ); 
+    ParseResult right = parseExpr( prevToken->lbp() );
+    Expr *leftexpr, *rightexpr;
+    leftexpr = dynamic_cast<Expr*>(left.ast);
+    rightexpr = dynamic_cast<Expr*>(right.ast);
 
+    Div* d = new Div(leftexpr, rightexpr);
+    pr.ast = (Node*)d;
     return pr ;
 }
 
@@ -422,14 +579,59 @@ ParseResult Parser::parseDivision ( ParseResult left ) {
    syntax tree to decide which method is better.
  */
 ParseResult Parser::parseRelationalExpr ( ParseResult left ) {
-    // parser has already matched left expression 
+    // parser has already matched left expression
     ParseResult pr ;
 
     nextToken( ) ;
     // just advance token, since examining it in parseExpr caused
     // this method being called.
-    parseExpr( prevToken->lbp() ); 
+    string op(prevToken->lexeme);
 
+    ParseResult right = parseExpr( prevToken->lbp() );
+
+    Expr *leftexpr, *rightexpr;
+    leftexpr = dynamic_cast<Expr*>(left.ast);
+    rightexpr = dynamic_cast<Expr*>(right.ast);
+
+
+    Expr* e;
+
+    //examine the operator string
+    // x ==
+    if (op.compare("==") == 0) {
+        equalEquals* expr = new equalEquals(leftexpr, rightexpr);
+        e = (Expr*) expr;
+    }
+    else if (op.compare("<=") == 0) {
+        lThanEquals* expr = new lThanEquals(leftexpr, rightexpr); //ERROR
+        e = (Expr*) expr;
+    }
+    else if (op.compare(">=") == 0) {
+        gThanEquals* expr = new gThanEquals(leftexpr, rightexpr); //ERROR
+        e = (Expr*) expr;
+    }
+    else if (op.compare("!=") == 0) {
+        nEquals* expr = new nEquals(leftexpr, rightexpr); //ERROR
+        e = (Expr*) expr;
+    }
+    else if (op.compare("<") == 0) {
+        lessThan* expr = new lessThan(leftexpr, rightexpr);
+        e = (Expr*) expr;
+    }
+    else if (op.compare(">") == 0) {
+         greaterThan* expr = new greaterThan(leftexpr, rightexpr);
+         e = (Expr*) expr;
+    }
+    else e = new Expr(); //dummy
+    //switch and create the appropriate object
+    //cast to Node and return
+
+
+
+
+
+
+    pr.ast = (Node*)e;
     return pr ;
 }
 
@@ -443,7 +645,7 @@ void Parser::match (tokenType tt) {
 }
 
 bool Parser::attemptMatch (tokenType tt) {
-    if (currToken->terminal == tt) { 
+    if (currToken->terminal == tt) {
         nextToken() ;
         return true ;
     }

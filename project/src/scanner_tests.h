@@ -326,7 +326,7 @@ public:
      */
 
     void test_scan_bad_syntax_good_tokens ( ) {
-        const char *filename = "../samples/bad_syntax_good_tokens.stm" ;
+        const char *filename = "../samples/bad_syntax_good_tokens.cff" ;
         char *text =  readInputFromFile ( filename )  ;
         TS_ASSERT ( text ) ;
         Token *tks = s->scan ( text ) ;
@@ -369,7 +369,7 @@ public:
     }
 
     void test_scan_sample_abstar ( ) {
-        scanFileNoLexicalErrors ("../samples/abstar.stm") ;
+        scanFileNoLexicalErrors ("../samples/abstar.cff") ;
     }
 
 

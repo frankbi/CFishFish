@@ -1,0 +1,12 @@
+Michael Cistera 4352091
+Frank Bi 3804098
+
+Frank did the design for the top (States, State, Decls, Decl, Program, Platform)
+Michael did the design for the bottom (Transitions, Transition, Stmts, Stmt, Expr)
+
+Frank added the three tests for the sample files
+Michael wrote getName(), getNumStates(), getNumVarUses(), and getNumDecls() and added the tests for them
+
+We worked on most of the parse functions together, doing some on our own
+
+For the writing in ast_tests.h we mostly wrote about the tests we each wrote.
