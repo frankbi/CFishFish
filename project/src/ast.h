@@ -38,7 +38,7 @@ class Type : public Node{
         enum TypeEnum getType();
     private:
         enum TypeEnum t;
-	//bool errorCheck();
+	   //bool errorCheck();
 };
 
 class Program : public Node {
@@ -50,6 +50,8 @@ class Program : public Node {
         int getNumStates() ;
         int getNumVarDecls() ;
         int getNumVarUses() ;
+        int cppCode_h() ; 
+        int cppCode_cpp() ;
 	protected:
 	    string programName;
 	    Platform* platform; //required
@@ -77,9 +79,6 @@ class Decl : public Node {
 
 };
 
-
-/*********************************************************/
-
 class Decls : public Node {
 	public:
 	    Decls();
@@ -90,8 +89,6 @@ class Decls : public Node {
 	    int getNumVarDecls();
 };
 
-
-/*********************************************************/
 
 class State : public Node {
 	public:

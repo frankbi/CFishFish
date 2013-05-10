@@ -26,6 +26,12 @@ extToken.o: extToken.cpp extToken.h scanner.h parser.h
 ast.o: ast.cpp ast.h
 	g++ $(FLAGS) -c ast.cpp
 
+
+# ITER4 #########################################
+cffc.o: cffc.cpp parser.h readInput.h
+	g++ $(FLAGS) -c cffc.cpp
+#################################################
+
 # Testing files and targets.
 run-tests:	regex_tests scanner_tests parser_tests ast_tests
 	./regex_tests
@@ -62,6 +68,11 @@ ast_tests: ast_tests.cpp readInput.o scanner.o extToken.o parseResult.o parser.o
 ast_tests.cpp: ast_tests.h readInput.o scanner.o extToken.o parser.o parseResult.o
 	$(CXXTEST) $(CXXFLAGS) -o ast_tests.cpp ast_tests.h
 
+# ITER4 ########################################
+cffc:
+	g++ $(FLAGS) -I$(CXX_DIR) -o cffc \
+		parser.h readInput.h
+################################################
 
 clean:
 	rm -Rf *.o \
