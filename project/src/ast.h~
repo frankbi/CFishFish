@@ -49,8 +49,8 @@ class Program : public Node {
         int getNumVarUses() ;
         
         
-        const char* cppCode_h() ; 
-        const char* cppCode_cpp() ;
+        const char cppCode_h() ; 
+        const char cppCode_cpp() ;
 	
 	
 	protected:

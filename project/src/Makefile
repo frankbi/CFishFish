@@ -79,4 +79,5 @@ clean:
 		regex_tests regex_tests.cpp \
 		scanner_tests scanner_tests.cpp \
 		parser_tests parser_tests.cpp \
-		ast_tests ast_tests.cpp
+		ast_tests ast_tests.cpp \
+		cffc

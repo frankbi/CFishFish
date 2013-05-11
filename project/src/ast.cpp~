@@ -24,8 +24,8 @@ int Program::getNumVarUses() {
 }
 
 
-const char* Program::cppCode_h() { return "Frank in cppCode_h"; }
-const char* Program::cppCode_cpp() { return "Frank in cppCode_cpp"; }
+const char Program::cppCode_h() { return "Frank in cppCode_h"; }
+const char Program::cppCode_cpp() { return "Frank in cppCode_cpp"; }
 
 
 

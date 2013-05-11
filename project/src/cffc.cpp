@@ -40,12 +40,12 @@ int main ( int argc, char **argv ) {
 
     ofstream machine_h ; // output stream class to operate on files
     machine_h.open ( "../cffc/Machine.h" );
-    machine_h << program->cppCode_h() ;
+    machine_h << program->cppCode_h() ; // TODO
     machine_h.close();
 
     ofstream machine_cpp ;
     machine_cpp.open ( "../cffc/Machine.cpp" );
-    machine_cpp << program->cppCode_cpp() ;
+    machine_cpp << program->cppCode_cpp() ; // TODO
     machine_cpp.close();
 
     return 0;
