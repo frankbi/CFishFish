@@ -17,25 +17,22 @@ class Stmt;
 class Stmts;
 class VariableUse;
 
-enum TypeEnum {
-    Int, Float, Boolean, String, Char
-};
+enum TypeEnum { Int, Float, Boolean, String, Char };
 
 class Node {
     public:
-
-    virtual ~Node() = 0; //make destructor pure virtual so that Node remains abstract, only necessary if there are no other pure virtual functions here
-	//virtual bool generateCode() = 0;
+	    virtual ~Node() = 0; 
+	    //make destructor pure virtual so that Node remains abstract, only necessary if there are no other pure virtual functions here
+	    //virtual bool generateCode() = 0;
 };
 
-class Type : public Node{
+class Type : public Node {
     public:
-        Type(){}
-        Type(enum TypeEnum);
-        enum TypeEnum getType();
+        Type() {} ;
+        Type(enum TypeEnum) ;
+        enum TypeEnum getType() ;
     private:
-        enum TypeEnum t;
-	   //bool errorCheck();
+        enum TypeEnum t ;
 };
 
 class Program : public Node {
@@ -47,6 +44,15 @@ class Program : public Node {
         int getNumStates() ;
         int getNumVarDecls() ;
         int getNumVarUses() ;
+        
+        
+        /*
+        	Need three methods on the class that represents lists of states
+        	that return these three parts of the generated file.
+        	
+        	Thus we may need 6 "code generation" methods for the class 
+        	representing the list of states.
+        */
         
         
         const char* cppCode_h() ; 
@@ -67,7 +73,7 @@ class Platform : public Node {
 	    Platform(string name);
 	    string platformName;
 	    //bool errorCheck();
-        //int getNumVarDecls(); Not necessary I don't think
+            //int getNumVarDecls(); Not necessary I don't think
 };
 
 class Decl : public Node {
@@ -117,7 +123,7 @@ class States : public Node {
 
 class Expr : public Node { //abstract
     public:
- //       virtual void* value() = 0;
+ 	// virtual void* value() = 0;
         Type getType();
         virtual int getNumVarUses();
     private:

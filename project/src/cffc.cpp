@@ -16,6 +16,7 @@ int main ( int argc, char **argv ) {
     char *filename = argv[1] ; // first argument
     string filepath = "../samples/" + string(filename) ; // sets filepath string with file address
     char *text = readInputFromFile ( filepath.c_str() )  ; // converts filepath to string and 
+    
     if ( ! text ) { // throw error from readInputFromFile failed
         cout << "File \"" << filepath << "\" not found." << endl ;
         return 2 ;
@@ -40,12 +41,12 @@ int main ( int argc, char **argv ) {
 
     ofstream machine_h ; // output stream class to operate on files
     machine_h.open ( "../cffc/Machine.h" );
-    machine_h << program->cppCode_h() ; // TODO
+    machine_h << program->cppCode_h() ;
     machine_h.close();
 
     ofstream machine_cpp ;
     machine_cpp.open ( "../cffc/Machine.cpp" );
-    machine_cpp << program->cppCode_cpp() ; // TODO
+    machine_cpp << program->cppCode_cpp() ;
     machine_cpp.close();
 
     return 0;

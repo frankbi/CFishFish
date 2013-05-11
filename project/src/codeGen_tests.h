@@ -3,9 +3,6 @@
 	These tests compare the generated ".h" file returned by cppCode_h and the
 	generated ".cpp" file returned by cppCode_cpp to sample working versions
 	of these files for each of the four programs.
-	
-	
-	
 */
 
 
