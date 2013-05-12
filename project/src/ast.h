@@ -105,7 +105,7 @@ class State : public Node {
 	    State(); //dummy
 	    State(Transitions* tran);
 	    Transitions* tran; //required
-	    bool errorCheck();
+	    //bool errorCheck();
 	    int getNumVarUses();
 };
 

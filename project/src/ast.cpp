@@ -55,7 +55,7 @@ string Program::cppCode_h() {
 	code_h.append("// Generated Machine.h for " + programName + " \n\n");
 	code_h.append("#include \"RunTime.h\" \n\n");
 	code_h.append("// Declarations of the State classes \n");
- 	for (int i; i < states.size(); i++) {
+ 	for (int i = 0; i < states.size(); i++) {
  		code_h.append("class State_" + states[i] + " ; \n");
  	}
  	code_h.append("\n\n");
@@ -65,28 +65,25 @@ string Program::cppCode_h() {
  	code_h.append("   void go() ; \n\n");
  	code_h.append("   " + platform + " *runTime ;\n\n");
  	
- 	code_h.append("   // Machine states");
- 	for (int i; i < states.size(); i++) {
- 		string temp = states[i];
- 		temp.erase(0,6);
- 		code_h.append("   State_" + states[i] + " *state_" + temp + " ; \n\n");
+ 	code_h.append("   // Machine states \n");
+ 	for (int i = 0; i < states.size(); i++) {
+ 		code_h.append("   State_" + states[i] + " *state_" + states[i] + " ; \n");
  	}
- 	code_h.append("} ; \n\n");
+ 	code_h.append("\n} ; \n\n");
  	
- 	code_h.append("class " + programName + "State: public Machine State { \n");
+ 	code_h.append("class " + programName + "State: public MachineState { \n");
 	code_h.append("   public: \n");
 	code_h.append("   " + programName + "_Machine *stateMachine ; \n");
 	code_h.append("} ; \n\n"); 	
  	
  	code_h.append("// Concrete machine states \n");
- 	for (int i; i < states.size(); i++) {
+ 	for (int i =0; i < states.size(); i++) {
  		code_h.append("class State_" + states[i] + " : public " + programName + "State { \n");
  		code_h.append("   public: \n");
  		code_h.append("   MachineState *enter() ; \n");
  		code_h.append("   State_" + states[i] + " ( " + programName + "_Machine *m ) ; \n");
  		code_h.append("} ; \n\n");
 	}
- 	
 	return code_h; 
 }
 
@@ -102,7 +99,7 @@ string Program::cppCode_cpp() {
 	code_cpp.append("// Generated Machine.cpp for " + programName + " \n\n");
 	code_cpp.append("#include \"Machine.h\" \n");
 	code_cpp.append("using namespace std ; \n");
-	code_cpp.append(programName + "_Machine::" + programName + "_Machine (int argc, char **argv) ");
+	code_cpp.append(programName + "_Machine::" + programName + "_Machine (int argc, char **argv) {");
 	
 	return code_cpp; 
 }
