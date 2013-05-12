@@ -55,8 +55,11 @@ class Program : public Node {
         */
         
         
-        const char* cppCode_h() ; 
-        const char* cppCode_cpp() ;
+        /// iter4 ///////////////
+        string cppCode_h() ; 
+        string cppCode_cpp() ;
+	///////////////////////////////
+	
 	
 	
 	protected:
@@ -132,7 +135,7 @@ class Expr : public Node { //abstract
 
 class BinOp : public Expr { //abstract, do not construct
     public:
-    BinOp(){};
+    BinOp() {};
     BinOp(Expr* left, Expr* right);
         virtual ~BinOp() = 0;
         Expr* left; //required

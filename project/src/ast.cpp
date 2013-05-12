@@ -1,7 +1,11 @@
 #include "ast.h"
 #include <cassert>
 
+#include <string>
+
 #include <iostream>
+
+using namespace std;
 
 Node::~Node() {
 }
@@ -39,18 +43,83 @@ int Program::getNumVarUses() {
     return sum;
 }
 
-const char* Program::cppCode_h() { 
-	return "// Generated"; 
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+
+
+string Program::cppCode_h() {
+
+	string code_h;
+	code_h.append("// Generated Machine.h for " + programName + " \n\n");
+	code_h.append("#include \"RunTime.h\" \n\n");
+	code_h.append("// Declarations of the State classes \n");
+ 	for (int i; i < states.size(); i++) {
+ 		code_h.append("class State_" + states[i] + " ; \n");
+ 	}
+ 	code_h.append("\n\n");
+ 	
+ 	code_h.append("class " + programName + "_Machine ");
+ 	code_h.append("{\n   public:\n   " + programName + "_Machine( int argc, char **argv ) ; \n\n");
+ 	code_h.append("   void go() ; \n\n");
+ 	code_h.append("   " + platform + " *runTime ;\n\n");
+ 	
+ 	code_h.append("   // Machine states");
+ 	for (int i; i < states.size(); i++) {
+ 		string temp = states[i];
+ 		temp.erase(0,6);
+ 		code_h.append("   State_" + states[i] + " *state_" + temp + " ; \n\n");
+ 	}
+ 	code_h.append("} ; \n\n");
+ 	
+ 	code_h.append("class " + programName + "State: public Machine State { \n");
+	code_h.append("   public: \n");
+	code_h.append("   " + programName + "_Machine *stateMachine ; \n");
+	code_h.append("} ; \n\n"); 	
+ 	
+ 	code_h.append("// Concrete machine states \n");
+ 	for (int i; i < states.size(); i++) {
+ 		code_h.append("class State_" + states[i] + " : public " + programName + "State { \n");
+ 		code_h.append("   public: \n");
+ 		code_h.append("   MachineState *enter() ; \n");
+ 		code_h.append("   State_" + states[i] + " ( " + programName + "_Machine *m ) ; \n");
+ 		code_h.append("} ; \n\n");
+	}
+ 	
+	return code_h; 
 }
 
-const char* Program::cppCode_cpp() { 
-	return "// Generated"; 
+
+
+
+
+
+
+string Program::cppCode_cpp() { 
+
+	string code_cpp;
+	code_cpp.append("// Generated Machine.cpp for " + programName + " \n\n");
+	code_cpp.append("#include \"Machine.h\" \n");
+	code_cpp.append("using namespace std ; \n");
+	code_cpp.append(programName + "_Machine::" + programName + "_Machine (int argc, char **argv) ");
+	
+	return code_cpp; 
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 Platform::Platform() {}
 
 Platform::Platform(string name) : platformName(name) {}
+
+
+
 
 Decl::Decl() {}
 
@@ -72,6 +141,9 @@ int Decls::getNumVarDecls() {
     return sum;
 }
 
+
+
+
 State::State() : tran(NULL) {}
 
 State::State(Transitions* t) : tran(t) { 
@@ -80,15 +152,19 @@ State::State(Transitions* t) : tran(t) {
 
 
 Stmt::Stmt(){} //dummy
+
 Stmt::Stmt(Expr* e, VariableUse* v) : expr(e), var(v) {}
+
 Stmts::Stmts() : left(NULL), right(NULL) { }
+
 Stmts::Stmts(Stmt* s, Stmts* next) : left(s), right(next) {}
 
 
 Transition::Transition() {}
 
 Transition::Transition(Stmts* toperf, Expr* toeval) : toPerform(toperf), eval(toeval), toGoto("") {}
-Transition::Transition(string go_to, Stmts* toperf, Expr* toeval) : toPerform(toperf), eval(toeval) ,toGoto(go_to){}
+
+Transition::Transition(string go_to, Stmts* toperf, Expr* toeval) : toPerform(toperf), eval(toeval) ,toGoto(go_to) {}
 
 Transitions::Transitions() : left(NULL), right(NULL) {}
 
