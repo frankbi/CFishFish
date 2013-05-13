@@ -40,6 +40,14 @@ State_Final::State_Final ( ABStar_Machine *m ) {
 }
 
 
+//
+//
+//
+//
+//
+//
+//
+//
 MachineState *State_NeedB::enter() {
    if ( (stateMachine->runTime->nextChar == 'b') ) { 
       stateMachine->runTime->outputBuffer = "In NeedB, found B" ;

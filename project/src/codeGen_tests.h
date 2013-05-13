@@ -57,7 +57,7 @@ public:
 
         const char *generated_h = p->cppCode_h().c_str() ;
 
-        int length_to_test_h = 5 ; // for initial testing
+        int length_to_test_h = 1 ; // for initial testing
         // int length_to_test_h = strlen (expected_h) ; // for final testing
         TSM_ASSERT_EQUALS ( "Comparing h code generated for " + program,
                             0, strncmp ( expected_h, generated_h,
@@ -70,7 +70,7 @@ public:
 
         const char *generated_cpp = p->cppCode_cpp().c_str() ;
 
-        int length_to_test_cpp = 5 ; // for initial testing
+        int length_to_test_cpp = 1 ; // for initial testing
         // int length_to_test_cpp = strlen (expected_cpp) ; // for final testing
         TSM_ASSERT_EQUALS ( "Comparing cpp code generated for " + program,
                             0, strncmp ( expected_cpp, generated_cpp,

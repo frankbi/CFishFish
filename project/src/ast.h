@@ -3,71 +3,59 @@
 
 #include <cstdlib>
 #include <string>
-#include <vector>
 
 //For the classes that make up the parser's abstract syntax tree
 using namespace std;
 
 class Platform;
 class Decls;
-class State;
+class States;
 class Transition;
 class Transitions;
 class Stmt;
 class Stmts;
 class VariableUse;
 
-enum TypeEnum { Int, Float, Boolean, String, Char };
+enum TypeEnum {
+    Int, Float, Boolean, String, Char
+};
+
+
 
 class Node {
     public:
-	    virtual ~Node() = 0; 
-	    //make destructor pure virtual so that Node remains abstract, only necessary if there are no other pure virtual functions here
-	    //virtual bool generateCode() = 0;
+
+    virtual ~Node() = 0; //make destructor pure virtual so that Node remains abstract, only necessary if there are no other pure virtual functions here
 };
 
-class Type : public Node {
+class Type : public Node{
     public:
-        Type() {} ;
-        Type(enum TypeEnum) ;
-        enum TypeEnum getType() ;
+        Type(){}
+        Type(enum TypeEnum);
+        enum TypeEnum getType();
     private:
-        enum TypeEnum t ;
+        enum TypeEnum t;
+	//bool errorCheck();
 };
 
 class Program : public Node {
 	public:
 	    Program(); //dummy
-	    Program(string name, Platform* platf, Decls* dec, vector<State*>* states);
+	    Program(string name, Platform* platf, Decls* dec, States* st);
 	    //virtual bool errorCheck();
 	    string getName();
         int getNumStates() ;
         int getNumVarDecls() ;
         int getNumVarUses() ;
         
+        string cppCode_h();
+        string cppCode_cpp();
         
-        /*
-        	Need three methods on the class that represents lists of states
-        	that return these three parts of the generated file.
-        	
-        	Thus we may need 6 "code generation" methods for the class 
-        	representing the list of states.
-        */
-        
-        
-        /// iter4 ///////////////
-        string cppCode_h() ; 
-        string cppCode_cpp() ;
-	///////////////////////////////
-	
-	
-	
 	protected:
 	    string programName;
 	    Platform* platform; //required
 	    Decls* decls;  //required
-	    vector<State*>* states;
-	    //States* states; //required
+	    States* states; //required
 };
 
 class Platform : public Node {
@@ -75,8 +63,6 @@ class Platform : public Node {
 	    Platform(); //dummy
 	    Platform(string name);
 	    string platformName;
-	    //bool errorCheck();
-            //int getNumVarDecls(); Not necessary I don't think
 };
 
 class Decl : public Node {
@@ -85,9 +71,8 @@ class Decl : public Node {
 	    Decl(Type t, string varname);
 	    Type declType;
 	    string variableName;
-	    //bool errorCheck(); // check for collisions in declarations
-
 };
+
 
 class Decls : public Node {
 	public:
@@ -95,115 +80,103 @@ class Decls : public Node {
 	    Decls(Decl* left, Decls* right);
 	    Decl* left; //optional
 	    Decls* right; //optional
-	    //bool errorCheck();
 	    int getNumVarDecls();
 };
 
-
 class State : public Node {
 	public:
-	    State(); //dummy
-	    State(Transitions* tran);
-	    Transitions* tran; //required
-	    //bool errorCheck();
-	    int getNumVarUses();
+		State(); //dummy
+		State(Transitions* tran, string sname);
+		Transitions* tran; //required
+		int getNumVarUses();
+		bool isInitial;
+		string stringname;
 };
 
-/*
 class States : public Node {
 	public:
-	    States();
-	    States(State* left, States* right);
-	    State* left; //optional
-	    States* right; //optional
-	    //bool errorCheck();
-        int getNumStates();
-        int getNumVarUses();
-};*/
-
-
-
+		States();
+		States(State* left, States* right);
+		State* left; //optional
+		States* right; //optional
+		int getNumStates();
+		int getNumVarUses();
+		string cppCode_states();
+};
 
 class Expr : public Node { //abstract
-    public:
- 	// virtual void* value() = 0;
-        Type getType();
-        virtual int getNumVarUses();
-    private:
-        Type t;
+	public:
+		Type getType();
+		virtual int getNumVarUses();
+	private:
+		Type t;
 };
 
 class BinOp : public Expr { //abstract, do not construct
-    public:
-    BinOp() {};
-    BinOp(Expr* left, Expr* right);
-        virtual ~BinOp() = 0;
-        Expr* left; //required
-        Expr* right; //required
-        int getNumVarUses();
-
-
+	public:
+		BinOp(){};
+		BinOp(Expr* left, Expr* right);
+		virtual ~BinOp() = 0;
+		Expr* left; //required
+		Expr* right; //required
+		int getNumVarUses();
 };
 
 class Plus : public BinOp {
-    public:
-        Plus(); //dummy
-        Plus(Expr* left, Expr* right)  : BinOp(left, right) {};
-   //     void* value();
+	public:
+		Plus(); //dummy
+		Plus(Expr* left, Expr* right)  : BinOp(left, right) {};
 };
-class Minus : public BinOp {
-    public:
-        Minus(); //dummy
-        Minus(Expr* left, Expr* right)  : BinOp(left, right) {};
-   //     void* value();
 
+class Minus : public BinOp {
+	public:
+		Minus(); //dummy
+		Minus(Expr* left, Expr* right)  : BinOp(left, right) {};
 };
+
 class Mul : public BinOp {
-    public:
-        Mul(); //dummy
-        Mul(Expr* left, Expr* right)  : BinOp(left, right) {};
-  //      void* value();
+	public:
+		Mul(); //dummy
+		Mul(Expr* left, Expr* right)  : BinOp(left, right) {};
 };
+
 class Div : public BinOp {
-    public:
-        Div(); //dummy
-        Div(Expr* left, Expr* right)  : BinOp(left, right) {};
- //       void* value();
-        //bool errorCheck(); //also check for div by 0
+	public:
+		Div(); //dummy
+		Div(Expr* left, Expr* right)  : BinOp(left, right) {};
 };
 
 class equalEquals : public BinOp{
-    public:
-        equalEquals(Expr* left, Expr* right) : BinOp(left, right) {}
+	public:
+		equalEquals(Expr* left, Expr* right) : BinOp(left, right) {}
 };
 
 class lThanEquals : public BinOp{ //FIXME:
-    public:
-        lThanEquals(Expr* left, Expr* right) : BinOp(left, right) {}
+	public:
+		lThanEquals(Expr* left, Expr* right) : BinOp(left, right) {}
 };
 
 class gThanEquals : public BinOp{ //FIXME:
-    public:
-        gThanEquals(Expr* left, Expr* right) : BinOp(left, right) {}
+	public:
+		gThanEquals(Expr* left, Expr* right) : BinOp(left, right) {}
 };
 
 class nEquals : public BinOp{ //FIXME:
-    public:
-        nEquals(Expr* left, Expr* right) : BinOp(left, right) {}
+	public:
+		nEquals(Expr* left, Expr* right) : BinOp(left, right) {}
 };
 
 
 class lessThan : public BinOp{
-    public:
-        lessThan(Expr* left, Expr* right) : BinOp(left, right) {}
+	public:
+		lessThan(Expr* left, Expr* right) : BinOp(left, right) {}
 };
 
 
 class greaterThan : public BinOp{
-    public:
-        greaterThan(Expr* left, Expr* right) : BinOp(left, right) {}
+	public:
+		greaterThan(Expr* left, Expr* right) : BinOp(left, right) {}
 };
-
 
 
 
@@ -317,7 +290,6 @@ class Transitions : public Node {
     Transition* left; //optional
     Transitions* right; //optional
 };
-
 
 
 #endif // AST_H_INCLUDED

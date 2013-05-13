@@ -42,7 +42,6 @@
 #include <cassert>
 #include <iostream>
 #include <sstream>
-#include <vector>
 
 using namespace std ;
 
@@ -96,21 +95,11 @@ ParseResult Parser::parseProgram () {
     Decls* decl = dynamic_cast<Decls*>(decls_result.ast);
     assert(decl != NULL);
 
-    vector<State*>* states = new vector<State*>;
-    while(!nextIs(endOfFile)){
-        ParseResult curstate = parseState();
-        State* current = dynamic_cast<State*>(curstate.ast);
-        states->push_back(current);
-    }
-    /*ParseResult states_result = parseStates() ;
+    ParseResult states_result = parseStates() ;
     States* state = dynamic_cast<States*>(states_result.ast);
-    assert(state != NULL);*/
+    assert(state != NULL);
 
-
-
-
-
-    Program* p = new Program(s, plat, decl, states);
+    Program* p = new Program(s, plat, decl, state);
 
     match(endOfFile) ;
 
@@ -123,24 +112,95 @@ ParseResult Parser::parseProgram () {
 }
 
 
-// Platform
-ParseResult Parser::parsePlatform () {
-    ParseResult pr ;
 
-    // Platform ::= platformKwd colon variableName semiColon
-    match(platformKwd) ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+// State
+ParseResult Parser::parseState () {
+    ParseResult pr ;
+    bool isInitial ;
+    
+    // State ::= stateKwd colon variableName
+    //           leftCurly Transitions rightCurly
+    // State ::= initialKwd stateKwd colon variableName
+    //           leftCurly Transitions rightCurly
+
+
+    if ( attemptMatch(initialKwd) ) {
+        isInitial = true ;
+    } else {
+        isInitial = false ;
+    }
+
+    match(stateKwd) ;
     match(colon) ;
     match(variableName) ;
+    
     string s(prevToken->lexeme);
+    
+    match(leftCurly) ;
 
-    match(semiColon) ;
 
-    Platform* p = new Platform(s);
-    pr.ast = (Node*)p;
+    ParseResult parse_transitions = parseTransitions() ;
+    Transitions* tran = dynamic_cast<Transitions*>(parse_transitions.ast);
+    match(rightCurly) ;
+    State* p = new State(tran, s);
+    pr.ast = p;
     pr.ok = true;
 
     return pr ;
 }
+
+
+
+// States
+ParseResult Parser::parseStates () {
+    ParseResult pr ;
+
+    if ( ! nextIs(endOfFile) ) {
+        // States ::= State States
+        
+        ParseResult parse_state = parseState() ;
+        State* left = dynamic_cast<State*>(parse_state.ast);
+        
+        ParseResult parse_states = parseStates() ;
+        States* right = dynamic_cast<States*>(parse_states.ast);
+        
+        States* p = new States(left, right);
+
+        pr.ast = p;
+    }
+    else {
+        // States ::=
+        // nothing to match.
+        States* em = new States();
+        pr.ast = em;
+    }
+
+    pr.ok = true;
+    return pr ;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -193,6 +253,10 @@ ParseResult Parser::parseDecl () {
 }
 
 
+
+
+
+
 // Type
 ParseResult Parser::parseType () {
     ParseResult pr ;
@@ -224,78 +288,38 @@ ParseResult Parser::parseType () {
 }
 
 
-// States
-/*
-ParseResult Parser::parseStates () {
+
+
+
+
+
+
+
+
+
+
+// Platform
+ParseResult Parser::parsePlatform () {
     ParseResult pr ;
 
-    if ( ! nextIs(endOfFile) ) {
-        // States ::= State States
-        ParseResult parse_state = parseState() ;
-        State* left = dynamic_cast<State*>(parse_state.ast);
-        ParseResult parse_states = parseStates() ;
-        States* right = dynamic_cast<States*>(parse_states.ast);
-        States* p = new States(left, right);
-
-        pr.ast = p;
-    }
-    else {
-        // States ::=
-        // nothing to match.
-        States* em = new States();
-        pr.ast = em;
-    }
-
-    pr.ok = true;
-    return pr ;
-}*/
-
-
-// State
-ParseResult Parser::parseState () {
-    ParseResult pr ;
-
-    // State ::= stateKwd colon variableName
-    //           leftCurly Transitions rightCurly
-    // State ::= initialKwd stateKwd colon variableName
-    //           leftCurly Transitions rightCurly
-
-    bool isInitial ;
-    if ( attemptMatch(initialKwd) ) {
-        isInitial = true ;
-    }
-    else {
-
-        isInitial = false ;
-    }
-
-    match(stateKwd) ;
+    // Platform ::= platformKwd colon variableName semiColon
+    match(platformKwd) ;
     match(colon) ;
     match(variableName) ;
-    match(leftCurly) ;
+    string s(prevToken->lexeme);
 
-    ParseResult parse_transitions = parseTransitions() ;
-    Transitions* tran = dynamic_cast<Transitions*>(parse_transitions.ast);
-    match(rightCurly) ;
-    State* p = new State(tran);
-    pr.ast = p;
+    match(semiColon) ;
+
+    Platform* p = new Platform(s);
+    pr.ast = (Node*)p;
     pr.ok = true;
 
     return pr ;
-
-    /* Compare this function to parseTransition.  The productions
-       parsed by both are similar in that they differ only in the
-       parts that begin the right hand side.  That is, the productions
-       parsed by each have common suffixes.  But parseState handles
-       the differing initial part (the optional 'initiial' keyword)
-       and the uses the same code to parse the common suffix.  The
-       parseTransition function has duplicated code for parsing the
-       common suffix.  Neither approach is always better than the
-       other.  It depends primarily on what we want to do with the
-       parsed code. We will see this in iteration 3 when we build
-       abstract syntax trees.
-     */
 }
+
+
+
+
 
 
 

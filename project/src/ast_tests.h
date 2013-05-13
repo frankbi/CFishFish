@@ -39,7 +39,6 @@ public:
     was off by a few. To remedy that, we went through the sample programs and recounted the number of variableUses
     and found that we had miscounted. The number of variableUses that the program returned was in fact correct.
 
-	Note: there is more text below
     */
 
 
@@ -166,9 +165,7 @@ public:
 
     Finally there are the tests for getNumStates which passed right after I wrote them.
 
-	After all tests were passing and the parser completed, we decided to switch the implementation of collections of State from using a linked list using classes States and State to having Program maintain a vector of State*. The tests passed the first time after compiling the new changes.
-	
-	
+
     */
 
 
@@ -246,7 +243,7 @@ public:
     void test_Transition_getNumVarUses(){
 
         Transition trans1(stmts, plus);
-        TS_ASSERT_EQUALS(trans1.getNumVarUses(), 6);//wrote Transition::getNumVarUses()
+        TS_ASSERT_EQUALS(trans1.getNumVarUses(), 6); //wrote Transition::getNumVarUses()
 
         tran = new Transition("", stmts, plus);
         TS_ASSERT_EQUALS(tran->getNumVarUses(), 6);
@@ -259,28 +256,27 @@ public:
         TS_ASSERT_EQUALS(trans->getNumVarUses(), 6);
     }
     State* st;
+    string sname;
     void test_State_getNumVarUses(){
-        st = new State(trans);
+        st = new State(trans, sname);
         TS_ASSERT_EQUALS(st->getNumVarUses(), 6);
     }
 
-    /*States* states;
+    States* states;
     States* bottom_states;
     States* first_states;
 
-    void xtest_States_getNumVarUses(){   //Split up the test into many, now getting a segfault here
+    void test_States_getNumVarUses(){   //Split up the test into many, now getting a segfault here
         bottom_states = new States();
         first_states = new States(st, bottom_states);   //fixed, was the same reason as the earlier segfault, States::left and right were not being initialized to NULL properly
         states = new States(st, first_states);
         TS_ASSERT_EQUALS(states->getNumVarUses(), 12);
-    }*/
+    }
 
 
     Program *prog;
     void test_Program_getNumVarUses(){
-        vector<State*>* states = new vector<State*>;
-        states->push_back(st);
-        states->push_back(st);
+
         prog = new Program("", NULL, NULL, states);
         TS_ASSERT_EQUALS(prog->getNumVarUses(), 12);
     }
@@ -288,11 +284,11 @@ public:
 
     //getNumStates tests
         //wrote getNumStates(), then wrote tests, passed right away
-    /*void xtest_States_getNumStates(){
+    void test_States_getNumStates(){
         TS_ASSERT_EQUALS(bottom_states->getNumStates(), 0);
         TS_ASSERT_EQUALS(first_states->getNumStates(), 1);
          TS_ASSERT_EQUALS(states->getNumStates(), 2);
-    }*/
+    }
 
     void test_Program_getNumStates(){
         TS_ASSERT_EQUALS(prog->getNumStates(), 2);

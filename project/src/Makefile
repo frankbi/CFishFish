@@ -2,82 +2,98 @@ CXX_DIR = ../lib/cxxtest
 CXXTEST = $(CXX_DIR)/cxxtestgen.pl
 CXXFLAGS = --error-printer --abort-on-fail --have-eh
 
-FLAGS = -Wall -g
+FLAGS   = -Wall -g
+CFFCDIR = ../cffc
 
-# Program files.
-readInput.o:	readInput.cpp readInput.h
-	g++ $(FLAGS) -c readInput.cpp
+PFILES  =   readInput.o     regex.o     scanner.o   parser.o    \
+            parseResult.o   extToken.o  ast.o
 
-regex.o:	regex.cpp regex.h
-	g++ $(FLAGS) -c regex.cpp
+cffc:   $(PFILES) cffc.o
+	g++ $(FLAGS) -o $(CFFCDIR)/cffc $^
 
-scanner.o:	scanner.cpp scanner.h regex.h
-	g++ $(FLAGS) -c scanner.cpp
 
-parser.o:   parser.cpp parser.h parseResult.h scanner.h
+readInput.o:        readInput.cpp   readInput.h
+	g++ $(FLAGS) -c readInput.cpp 
+
+regex.o:            regex.cpp       regex.h
+	g++ $(FLAGS) -c regex.cpp 
+
+scanner.o:          scanner.cpp     scanner.h   regex.h
+	g++ $(FLAGS) -c scanner.cpp 
+
+parser.o:           parser.cpp      parser.h    scanner.h       \
+	                extToken.h      ast.h       parseResult.h
 	g++ $(FLAGS) -c parser.cpp
 
-parseResult.o:  parseResult.cpp parseResult.h
+parseResult.o:      parseResult.cpp parseResult.h               \
+	                ast.h
 	g++ $(FLAGS) -c parseResult.cpp
 
-extToken.o: extToken.cpp extToken.h scanner.h parser.h
+extToken.o:         extToken.cpp    extToken.h  parser.h
 	g++ $(FLAGS) -c extToken.cpp
 
-ast.o: ast.cpp ast.h
+ast.o:              ast.cpp         ast.h
 	g++ $(FLAGS) -c ast.cpp
 
-
-# ITER4 #########################################
-cffc.o: cffc.cpp parser.h readInput.h
+cffc.o:             cffc.cpp        parser.h    readInput.h     \
+	                scanner.h       parseResult.h   ast.h
 	g++ $(FLAGS) -c cffc.cpp
-#################################################
 
-# Testing files and targets.
-run-tests:	regex_tests scanner_tests parser_tests ast_tests
+run-tests:          regex_tests     scanner_tests   parser_tests\
+	                ast_tests
 	./regex_tests
 	./scanner_tests
 	./parser_tests
 	./ast_tests
 
-regex_tests:	regex_tests.cpp regex.o
-	g++ $(FLAGS) -I$(CXX_DIR) -o regex_tests regex.o regex_tests.cpp
+regex_tests:        regex_tests.cpp regex.o
+	g++ $(FLAGS) -I$(CXX_DIR) -o regex_tests                    \
+		$^
 
-regex_tests.cpp:	regex.h regex_tests.h
-	$(CXXTEST) $(CXXFLAGS) -o regex_tests.cpp regex_tests.h
+regex_tests.cpp:    regex_tests.h
+	$(CXXTEST) $(CXXFLAGS)    -o regex_tests.cpp                \
+		regex_tests.h
 
+scanner_tests:      scanner_tests.cpp   scanner.o   regex.o     \
+			readInput.o
+	g++ $(FLAGS) -I$(CXX_DIR) -o scanner_tests                  \
+		$^
 
-scanner_tests:	scanner_tests.cpp scanner.o regex.o readInput.o
-	g++ $(FLAGS) -I$(CXX_DIR)  -o scanner_tests \
-		scanner.o regex.o readInput.o scanner_tests.cpp
+scanner_tests.cpp:  scanner_tests.h
+	$(CXXTEST) $(CXXFLAGS)    -o scanner_tests.cpp              \
+		scanner_tests.h
 
-scanner_tests.cpp:	scanner.o scanner_tests.h readInput.h
-	$(CXXTEST) $(CXXFLAGS) -o scanner_tests.cpp scanner_tests.h
+parser_tests:       parser_tests.cpp    $(PFILES)
+	g++ $(FLAGS) -I$(CXX_DIR) -o parser_tests                   \
+		$^
 
+parser_tests.cpp:   parser_tests.h      $(PFILES)
+	$(CXXTEST) $(CXXFLAGS)    -o parser_tests.cpp               \
+		parser_tests.h
 
-parser_tests:	parser_tests.cpp parser.o parseResult.o readInput.o scanner.o extToken.o regex.o ast.o
-	g++ $(FLAGS) -I$(CXX_DIR) -o parser_tests \
-		parser.o parseResult.o readInput.o scanner.o extToken.o regex.o ast.o parser_tests.cpp
+ast_tests:          ast_tests.cpp       $(PFILES)
+	g++ $(FLAGS) -I$(CXX_DIR) -o ast_tests                      \
+		$^
 
-parser_tests.cpp:   parser.o parser_tests.h parser.h parseResult.h readInput.h scanner.h extToken.h ast.h
-	$(CXXTEST) $(CXXFLAGS) -o parser_tests.cpp parser_tests.h
+ast_tests.cpp:      ast_tests.h         $(PFILES)
+	$(CXXTEST) $(CXXFLAGS)    -o ast_tests.cpp                  \
+		ast_tests.h
 
-ast_tests: ast_tests.cpp readInput.o scanner.o extToken.o parseResult.o parser.o regex.o ast.o
-	g++ $(FLAGS) -I$(CXX_DIR) -o ast_tests \
-		readInput.o scanner.o extToken.o parseResult.o parser.o regex.o ast.o ast_tests.cpp
+#codeGen_tests:      codeGen_tests.cpp   $(PFILES)
+	#g++ $(FLAGS) -I$(CXX_DIR) -o codeGen_tests                  \
+		#$^
 
-ast_tests.cpp: ast_tests.h readInput.o scanner.o extToken.o parser.o parseResult.o
-	$(CXXTEST) $(CXXFLAGS) -o ast_tests.cpp ast_tests.h
-
-# ITER4 ########################################
-cffc:
-	g++ $(FLAGS) -I$(CXX_DIR) -o ../cffc/cffc \
-		parser.h readInput.h
-################################################
+#codeGen_tests.cpp:  codeGen_tests.h     $(PFILES)
+	#$(CXXTEST) $(CXXFLAGS)    -o codeGen_tests.cpp              \
+		#codeGen_tests.h
 
 clean:
-	rm -Rf *.o \
-		regex_tests regex_tests.cpp \
-		scanner_tests scanner_tests.cpp \
-		parser_tests parser_tests.cpp \
-		ast_tests ast_tests.cpp \
-		../cffc/cffc
+	rm -Rf                                                      \
+		*.o             *.exe                                   \
+		regex_tests     regex_tests.cpp                         \
+		scanner_tests   scanner_tests.cpp                       \
+		parser_tests    parser_tests.cpp                        \
+		ast_tests       ast_tests.cpp                           \
+		codeGen_tests   codeGen_tests.cpp                       \
+		$(CFFCDIR)/cffc $(CFFCDIR)/Machine.h                    \
+		$(CFFCDIR)/Machine.cpp
