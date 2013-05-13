@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <string>
 
-//For the classes that make up the parser's abstract syntax tree
 using namespace std;
 
 class Platform;
@@ -20,12 +19,9 @@ enum TypeEnum {
     Int, Float, Boolean, String, Char
 };
 
-
-
 class Node {
     public:
-
-    virtual ~Node() = 0; //make destructor pure virtual so that Node remains abstract, only necessary if there are no other pure virtual functions here
+    	virtual ~Node() = 0;
 };
 
 class Type : public Node{
@@ -35,14 +31,12 @@ class Type : public Node{
         enum TypeEnum getType();
     private:
         enum TypeEnum t;
-	//bool errorCheck();
 };
 
 class Program : public Node {
 	public:
-	    Program(); //dummy
+	    Program();
 	    Program(string name, Platform* platf, Decls* dec, States* st);
-	    //virtual bool errorCheck();
 	    string getName();
         int getNumStates() ;
         int getNumVarDecls() ;
@@ -53,21 +47,21 @@ class Program : public Node {
         
 	protected:
 	    string programName;
-	    Platform* platform; //required
-	    Decls* decls;  //required
-	    States* states; //required
+	    Platform* platform;
+	    Decls* decls;
+	    States* states;
 };
 
 class Platform : public Node {
 	public:
-	    Platform(); //dummy
+	    Platform();
 	    Platform(string name);
 	    string platformName;
 };
 
 class Decl : public Node {
 	public:
-	    Decl(); //dummy
+	    Decl();
 	    Decl(Type t, string varname);
 	    Type declType;
 	    string variableName;
@@ -96,11 +90,12 @@ class State : public Node {
 class States : public Node {
 	public:
 		States();
-		States(State* left, States* right);
-		State* left; //optional
-		States* right; //optional
+		States(State *left, States *right);
+		State *left;
+		States *right;
 		int getNumStates();
 		int getNumVarUses();
+		States *next_ptr; // helper variable pointer
 		string cppCode_states();
 };
 

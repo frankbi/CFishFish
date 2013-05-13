@@ -34,19 +34,9 @@ int Program::getNumVarUses() {
 	return states->getNumVarUses();
 }
 
-string States::cppCode_states() {
-	string curr;
-	if (right != NULL) {
-		curr = left->stringname;
-	}
-	return curr;
-}
-
-
-
-
-
 string Program::cppCode_h() {
+
+ 	int count = states->getNumStates();
 
 	string code_h;
 	code_h.append("// Generated Machine.h for " + programName + " \n\n");
@@ -54,10 +44,11 @@ string Program::cppCode_h() {
 	code_h.append("#include \"RunTime.h\" \n\n");
 	code_h.append("// Declarations of the State classes \n");
  	
- 	for (int i = 0; i < states->getNumStates(); i++) {
- 		code_h.append("class State_" + states->cppCode_states() + " ; \n"); 	
- 		//cout << states->right->getNumStates() << endl;
+ 	for (int i = 0; i < count; i++) {	
+ 		code_h.append("class State_" + states->left->stringname + " ; \n"); 
+ 		states = states->right;
  	}
+ 	
  	
  	code_h.append("\n\n");
  	code_h.append("class " + programName + "_Machine ");
@@ -66,10 +57,12 @@ string Program::cppCode_h() {
  	code_h.append("   " + platform->platformName + " *runTime ;\n\n");
  	code_h.append("   // Machine states \n");
 
-	for (int i = 0; i < states->getNumStates(); i++) {
- 		code_h.append("   State_" + states->cppCode_states() + " *state_" + states->cppCode_states() + " ; \n");
+	for (int i = 0; i < count; i++) {
+ 		cout << "dsfd" << endl;
+ 		//code_h.append("   State_" + states->left->stringname + " *state_" + states->left->stringname + " ; \n");
  	}
  	
+ 	/*
  	code_h.append("\n} ; \n\n");
  	code_h.append("class " + programName + "State: public MachineState { \n");
 	code_h.append("   public: \n");
@@ -77,15 +70,15 @@ string Program::cppCode_h() {
 	code_h.append("} ; \n\n"); 	
  	code_h.append("// Concrete machine states \n");
 
-	for (int i = 0; i < states->getNumStates(); i++) {
-		code_h.append("class State_" + states->cppCode_states() + " : public " + programName + "State { \n");
+	for (int i = 0; i < count; i++) {
+		code_h.append("class State_" + states->left->stringname + " : public " + programName + "State { \n");
 		code_h.append("   public: \n");
 		code_h.append("   MachineState *enter() ; \n");
-		code_h.append("   State_" + states->cppCode_states() + " ( " + programName + "_Machine *m ) ; \n");
+		code_h.append("   State_" + states->left->stringname + " ( " + programName + "_Machine *m ) ; \n");
 		code_h.append("} ; \n\n");
+		states = states->right;
 	}
-	
-	
+	*/
 	return code_h; 
 }
 
@@ -95,6 +88,7 @@ string Program::cppCode_cpp() {
 
 	string code_cpp;
 	code_cpp.append("// Generated Machine.cpp for " + programName + " \n\n");
+	/*
 	code_cpp.append("#include \"Machine.h\" \n");
 	code_cpp.append("using namespace std ; \n");
 	code_cpp.append(programName + "_Machine::" + programName + "_Machine (int argc, char **argv) {");
@@ -114,9 +108,8 @@ string Program::cppCode_cpp() {
 	code_cpp.append("// Concrete machine states \n\n");
 	
 	
-	
-	
-	
+	*/
+		
 	return code_cpp; 
 }
 
@@ -156,7 +149,7 @@ State::State(Transitions* t, string s) : tran(t), stringname(s) { assert(tran !=
 
 States::States() : left(NULL), right(NULL) {}
 
-States::States(State* st, States* next) : left(st), right(next) {}
+States::States(State* st, States* next) : left(st), right(next), next_ptr(right) {}
 
 int States::getNumStates() {
     int sum = 0;

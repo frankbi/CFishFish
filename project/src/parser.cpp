@@ -88,7 +88,6 @@ ParseResult Parser::parseProgram () {
     ParseResult platform_result = parsePlatform() ;
 
     Platform* plat = dynamic_cast<Platform*>(platform_result.ast); // will segfault because parsePlatform is not yet implemented, the returned parseResult's AST pointer will be NULL
-    //assert(plat != NULL);
     if (plat == NULL) cout << "Platform NULL\n";
 
     ParseResult decls_result = parseDecls() ;
@@ -136,19 +135,18 @@ ParseResult Parser::parseState () {
     // State ::= initialKwd stateKwd colon variableName
     //           leftCurly Transitions rightCurly
 
-
+	
     if ( attemptMatch(initialKwd) ) {
         isInitial = true ;
     } else {
         isInitial = false ;
-    }
+	}
+	
 
     match(stateKwd) ;
     match(colon) ;
     match(variableName) ;
-    
     string s(prevToken->lexeme);
-    
     match(leftCurly) ;
 
 
