@@ -44,9 +44,10 @@ string Program::cppCode_h() {
 	code_h.append("#include \"RunTime.h\" \n\n");
 	code_h.append("// Declarations of the State classes \n");
  	
- 	for (int i = 0; i < count; i++) {	
- 		code_h.append("class State_" + states->left->stringname + " ; \n"); 
- 		states = states->right;
+ 	States *ptr = states;	
+ 	for (int i = 0; i < count; i++) {
+ 		code_h.append("class State_" + ptr->left->stringname + " ; \n"); 
+ 		ptr = ptr->right;
  	}
  	
  	
@@ -57,12 +58,12 @@ string Program::cppCode_h() {
  	code_h.append("   " + platform->platformName + " *runTime ;\n\n");
  	code_h.append("   // Machine states \n");
 
+	States *ptr1 = states;
 	for (int i = 0; i < count; i++) {
- 		cout << "dsfd" << endl;
- 		//code_h.append("   State_" + states->left->stringname + " *state_" + states->left->stringname + " ; \n");
+ 		code_h.append("   State_" + ptr1->left->stringname + " *state_" + ptr1->left->stringname + " ; \n");
+ 		ptr1 = ptr1->right;
  	}
  	
- 	/*
  	code_h.append("\n} ; \n\n");
  	code_h.append("class " + programName + "State: public MachineState { \n");
 	code_h.append("   public: \n");
@@ -70,15 +71,16 @@ string Program::cppCode_h() {
 	code_h.append("} ; \n\n"); 	
  	code_h.append("// Concrete machine states \n");
 
+	States *ptr2 = states;
 	for (int i = 0; i < count; i++) {
-		code_h.append("class State_" + states->left->stringname + " : public " + programName + "State { \n");
+		code_h.append("class State_" + ptr2->left->stringname + " : public " + programName + "State { \n");
 		code_h.append("   public: \n");
 		code_h.append("   MachineState *enter() ; \n");
-		code_h.append("   State_" + states->left->stringname + " ( " + programName + "_Machine *m ) ; \n");
+		code_h.append("   State_" + ptr2->left->stringname + " ( " + programName + "_Machine *m ) ; \n");
 		code_h.append("} ; \n\n");
-		states = states->right;
+		ptr2 = ptr2->right;
 	}
-	*/
+	
 	return code_h; 
 }
 
