@@ -1,40 +1,3 @@
-/* A recursive descent parser with operator precedence.
-
-   Author: Eric Van Wyk
-
-   This algorithm is based on the work of Douglas Crockford in "Top
-   Down Operator Precedence", a chapter in the book "Beautiful Code".
-   Mr. Crockford describes in his chapter how his work is based on an
-   algorithm described Vaughan Pratt in "Top Down Operator
-   Precedence", presented at the ACM Symposium on Principles of
-   Programming Languages.
-
-   Douglas Crockford's chapter is available at
-    http://javascript.crockford.com/tdop/tdop.html
-
-   Vaughan Pratt's paper is available at
-    http://portal.acm.org/citation.cfm?id=512931
-
-   These are both quite interesting works and worth reading if you
-   find the problem of parsing to be an interesting one.
-
-   Last modified: March 5, 2013.
-*/
-
-/*
-
-    So that we did not have to implement everything before being able to run tests on the parser,
-    we created dummy objects in each parse function with a constructor that took no arguments. This
-    way running the tests would not result in a segmentation fault as a higher-level parse function
-    attempted to call dynamic_cast on a NULL pointer.
-
-    We wrote the parse functions from top to bottom, starting with Program and ending with the subclasses
-    of Expr and BinOp. Because we created dummy objects in the lower-level parse functions, our parser
-    could successfully return a Program and our tests could call getName() or getNumVarUses() on it before
-    we wrote anything else, they just would not necessarily return the right value.
-
-*/
-
 #include "parser.h"
 #include "scanner.h"
 #include "extToken.h"
@@ -67,10 +30,7 @@ ParseResult Parser::parse (const char *text) {
     return pr ;
 }
 
-/*
- * parse methods for non-terminal symbols
- * --------------------------------------
- */
+
 
 // Program
 ParseResult Parser::parseProgram () {
@@ -110,21 +70,6 @@ ParseResult Parser::parseProgram () {
     return pr ;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // State
 ParseResult Parser::parseState () {
     ParseResult pr ;
@@ -159,7 +104,6 @@ ParseResult Parser::parseState () {
 
     return pr ;
 }
-
 
 
 // States
@@ -360,6 +304,7 @@ ParseResult Parser::parseTransition () {
         match(gotoKwd) ;
         match(variableName) ;
         string toGoto(prevToken->lexeme);
+        
         match(whenKwd) ;
         ParseResult expr_result = parseExpr(0);
         Expr* expr = dynamic_cast<Expr*>(expr_result.ast);
@@ -370,8 +315,7 @@ ParseResult Parser::parseTransition () {
         match(rightCurly) ;
         match(semiColon) ;
         t = new Transition(toGoto, statements, expr);
-    }
-    else {
+    } else {
         // Transition ::= exitKwd whenKwd Expr
         //                performingKwd leftCurly Stmts rightCurly semiColon
         match(exitKwd) ;

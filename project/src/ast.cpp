@@ -35,42 +35,33 @@ int Program::getNumVarUses() {
 }
 
 string Program::cppCode_h() {
-
  	int count = states->getNumStates();
-
 	string code_h;
 	code_h.append("// Generated Machine.h for " + programName + " \n\n");
-		
 	code_h.append("#include \"RunTime.h\" \n\n");
 	code_h.append("// Declarations of the State classes \n");
- 	
  	States *ptr = states;	
  	for (int i = 0; i < count; i++) {
  		code_h.append("class State_" + ptr->left->stringname + " ; \n"); 
  		ptr = ptr->right;
  	}
- 	
- 	
  	code_h.append("\n\n");
  	code_h.append("class " + programName + "_Machine ");
  	code_h.append("{\n   public:\n   " + programName + "_Machine( int argc, char **argv ) ; \n\n");
  	code_h.append("   void go() ; \n\n");
  	code_h.append("   " + platform->platformName + " *runTime ;\n\n");
  	code_h.append("   // Machine states \n");
-
 	States *ptr1 = states;
 	for (int i = 0; i < count; i++) {
  		code_h.append("   State_" + ptr1->left->stringname + " *state_" + ptr1->left->stringname + " ; \n");
  		ptr1 = ptr1->right;
  	}
- 	
  	code_h.append("\n} ; \n\n");
  	code_h.append("class " + programName + "State: public MachineState { \n");
 	code_h.append("   public: \n");
 	code_h.append("   " + programName + "_Machine *stateMachine ; \n");
 	code_h.append("} ; \n\n"); 	
  	code_h.append("// Concrete machine states \n");
-
 	States *ptr2 = states;
 	for (int i = 0; i < count; i++) {
 		code_h.append("class State_" + ptr2->left->stringname + " : public " + programName + "State { \n");
@@ -80,7 +71,6 @@ string Program::cppCode_h() {
 		code_h.append("} ; \n\n");
 		ptr2 = ptr2->right;
 	}
-	
 	return code_h; 
 }
 
@@ -88,36 +78,63 @@ string Program::cppCode_h() {
 
 string Program::cppCode_cpp() { 
 
+	Transition *tran;
+	
+	int count = states->getNumStates();
+	
 	string code_cpp;
 	code_cpp.append("// Generated Machine.cpp for " + programName + " \n\n");
-	/*
+	
 	code_cpp.append("#include \"Machine.h\" \n");
 	code_cpp.append("using namespace std ; \n");
 	code_cpp.append(programName + "_Machine::" + programName + "_Machine (int argc, char **argv) {");
 	code_cpp.append("   runTime = new " + platform->platformName + "(argc, argv) ; \n");
 	code_cpp.append("// Creating state objects \n");
 	
-	
-	for (int i = 0; i < states->getNumStates(); i++) {
-		code_cpp.append("   state_" + states->cppCode_states() + " = new State_" + states->cppCode_states() + "(this) ; \n");
+	States *ptr = states;
+	for (int i = 0; i < count; i++) {
+		code_cpp.append("   state_" + ptr->left->stringname + " = new State_" + ptr->left->stringname + "(this) ; \n");
+		ptr = ptr->right;
 	}
+	
 	code_cpp.append("} \n\n");
 	
-	code_cpp.append("void " + programName + "_Machine::go() {");
-	code_cpp.append("   runTime->run( state_" + states->cppCode_states() + " ); \n");
+	code_cpp.append("void " + programName + "_Machine::go() {\n");
+	code_cpp.append("   runTime->run( state_" + states->left->stringname + " ); \n");
 	code_cpp.append("} \n\n");
 	
-	code_cpp.append("// Concrete machine states \n\n");
+	code_cpp.append("// Concrete machine states \n");
 	
+	States *ptr1 = states; 
+	for (int i = 0; i < count; i++) {
+		code_cpp.append("MachineState *State_" + ptr1->left->stringname + "::enter() { \n");
+		code_cpp.append("\n\n\n}\n\n");
 	
-	*/
-		
+		code_cpp.append("State_" + ptr1->left->stringname + " ( " + programName + "_Machine *m ) { \n");
+		code_cpp.append("   stateMachine = m ; \n");
+		code_cpp.append("}\n\n");	
+		ptr1 = ptr1->right;
+	}
+	
+	code_cpp.append("\n\n\n\n");
+	code_cpp.append("// A 'main' program to run the state machine.\n");
+	code_cpp.append("int main (int argc, char **argv) { \n");
+	code_cpp.append("  " + programName + "_Machine *" + programName + " = new " + programName + "_Machine (argc, argv) ; \n");
+	code_cpp.append("  " + programName + "->go() ; \n");
+	code_cpp.append("} \n\n");
+	
+	cout << tran->cppCode_cpp_transitions() << endl;
+	
 	return code_cpp; 
 }
 
-
-
-
+string Transition::cppCode_cpp_transitions() {
+	if (Transition::toGoto == NULL) {
+		return "toGoto is null";
+	} else {
+		return "toGoto is not nul";
+	}
+}
 
 
 
@@ -151,7 +168,7 @@ State::State(Transitions* t, string s) : tran(t), stringname(s) { assert(tran !=
 
 States::States() : left(NULL), right(NULL) {}
 
-States::States(State* st, States* next) : left(st), right(next), next_ptr(right) {}
+States::States(State* st, States* next) : left(st), right(next) {}
 
 int States::getNumStates() {
     int sum = 0;

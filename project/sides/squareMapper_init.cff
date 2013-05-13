@@ -1,0 +1,4 @@
+initial state: Square {
+  goto Square when true 
+    performing { output := input * input ; } ;
+} 

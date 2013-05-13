@@ -1,19 +1,3 @@
-// Generated Machine.cpp for ABStar
-
-#include "Machine.h"
-using namespace std ;
-ABStar_Machine::ABStar_Machine (int argc, char **argv) { 
-   runTime = new RegexRecognizer(argc, argv) ; 
-   // Creating state objects 
-   state_Final = new State_Final(this) ; 
-   state_NeedB = new State_NeedB(this) ; 
-   state_Error = new State_Error(this) ; 
-} 
-
-void ABStar_Machine::go() { 
-   runTime->run( state_Final ); 
-} 
-
 // Concrete machine states
 MachineState *State_Final::enter() {
    if ( (stateMachine->runTime->nextChar == 'a') ) { 
@@ -35,10 +19,7 @@ MachineState *State_Final::enter() {
 
 }
 
-State_Final::State_Final ( ABStar_Machine *m ) {
-   stateMachine = m ; 
-}
-
+/////////////////////////////////////////////////////////////////////////////////////////
 
 MachineState *State_NeedB::enter() {
    if ( (stateMachine->runTime->nextChar == 'b') ) { 
@@ -60,10 +41,7 @@ MachineState *State_NeedB::enter() {
 
 }
 
-State_NeedB::State_NeedB ( ABStar_Machine *m ) {
-   stateMachine = m ; 
-}
-
+/////////////////////////////////////////////////////////////////////////////////////////
 
 MachineState *State_Error::enter() {
    if ( (stateMachine->runTime->nextChar != '\0') ) { 
@@ -78,17 +56,4 @@ MachineState *State_Error::enter() {
       return NULL ;   } 
 
 }
-
-State_Error::State_Error ( ABStar_Machine *m ) {
-   stateMachine = m ; 
-}
-
-
-
-
-// A 'main' program to run the state machine.
-int main (int argc, char **argv) { 
-  ABStar_Machine *ABStar = new ABStar_Machine (argc, argv) ; 
-  ABStar->go() ; 
-} 
 
