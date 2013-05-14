@@ -94,9 +94,9 @@ ParseResult Parser::parseState () {
     string s(prevToken->lexeme);
     match(leftCurly) ;
 
-
     ParseResult parse_transitions = parseTransitions() ;
     Transitions* tran = dynamic_cast<Transitions*>(parse_transitions.ast);
+    
     match(rightCurly) ;
     State* p = new State(tran, s);
     pr.ast = p;
@@ -266,10 +266,6 @@ ParseResult Parser::parsePlatform () {
 
 
 
-
-/* ----------------------------------------------------------- */
-
-
 // Transitions
 ParseResult Parser::parseTransitions () {
     ParseResult pr ;
@@ -303,15 +299,20 @@ ParseResult Parser::parseTransition () {
         //                performingKwd leftCurly Stmts rightCurly semiColon
         match(gotoKwd) ;
         match(variableName) ;
+        
         string toGoto(prevToken->lexeme);
         
         match(whenKwd) ;
+        
         ParseResult expr_result = parseExpr(0);
         Expr* expr = dynamic_cast<Expr*>(expr_result.ast);
+        
         match(performingKwd) ;
         match(leftCurly) ;
+        
         ParseResult statements_result = parseStmts() ;
         Stmts* statements = dynamic_cast<Stmts*>(statements_result.ast);
+        
         match(rightCurly) ;
         match(semiColon) ;
         t = new Transition(toGoto, statements, expr);
@@ -320,12 +321,16 @@ ParseResult Parser::parseTransition () {
         //                performingKwd leftCurly Stmts rightCurly semiColon
         match(exitKwd) ;
         match(whenKwd) ;
+        
         ParseResult expr_result = parseExpr(0) ;
         Expr* expr = dynamic_cast<Expr*>(expr_result.ast);
+        
         match(performingKwd) ;
         match(leftCurly) ;
+        
         ParseResult statements_result = parseStmts() ;
         Stmts* statements = dynamic_cast<Stmts*>(statements_result.ast);
+        
         match(rightCurly) ;
         match(semiColon) ;
         t = new Transition(statements, expr);

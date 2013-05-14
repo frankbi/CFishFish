@@ -24,7 +24,7 @@ class Node {
 		virtual ~Node() = 0;
 };
 
-class Type : public Node{
+class Type : public Node {
 	public:
 		Type() {}
 		Type(enum TypeEnum);
@@ -103,13 +103,14 @@ class States : public Node {
 		int getNumStates();
 		int getNumVarUses();
 		string cppCode_states();
+		string cppCode_trans();
 };
 
 class Expr : public Node { //abstract
 	public:
 		Type getType();
 		virtual int getNumVarUses();
-	private:
+//	private:
 		Type t;
 };
 
@@ -247,7 +248,7 @@ class Stmt : public Node {
 		Stmt(); //dummy
 		Stmt(Expr* expr, VariableUse* var);
 		int getNumVarUses();
-	private:
+//	private:
 		Expr* expr; //required
 		VariableUse* var; //required
 		Type* t; //required
@@ -259,7 +260,7 @@ class Stmts : public Node {
 		Stmts(Stmt* s);
 		Stmts(Stmt* s, Stmts* next);
 		int getNumVarUses();
-	private:
+//	private:
 		Stmt* left;
 		Stmts* right;
 };
@@ -274,8 +275,7 @@ class Transition : public Node {
 		Transition(Stmts*, Expr*); //when exiting
 		Transition(string, Stmts*, Expr*); //normal case
 		int getNumVarUses();
-		string cppCode_cpp_transitions();
-	private:
+//	private:
 		Stmts *toPerform;
 		Expr *eval;
 		string toGoto; //optional, if empty just exit
@@ -287,7 +287,7 @@ class Transitions : public Node {
 		Transitions();
 		Transitions(Transition* tr, Transitions* next);
 		int getNumVarUses();
-	private:
+//	private:
 		Transition* left;
 		Transitions* right;
 };

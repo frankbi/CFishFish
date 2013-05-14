@@ -78,8 +78,6 @@ string Program::cppCode_h() {
 
 string Program::cppCode_cpp() { 
 
-	Transition *tran;
-	
 	int count = states->getNumStates();
 	
 	string code_cpp;
@@ -108,6 +106,11 @@ string Program::cppCode_cpp() {
 	States *ptr1 = states; 
 	for (int i = 0; i < count; i++) {
 		code_cpp.append("MachineState *State_" + ptr1->left->stringname + "::enter() { \n");
+		
+		// STMTS, EXPR
+		
+		
+		
 		code_cpp.append("\n\n\n}\n\n");
 	
 		code_cpp.append("State_" + ptr1->left->stringname + " ( " + programName + "_Machine *m ) { \n");
@@ -123,19 +126,25 @@ string Program::cppCode_cpp() {
 	code_cpp.append("  " + programName + "->go() ; \n");
 	code_cpp.append("} \n\n");
 	
-	cout << tran->cppCode_cpp_transitions() << endl;
+	cout << states->left->tran->right->left->getNumVarUses() << endl;
+	//cout << states->left->tran->left->eval << endl;
 	
 	return code_cpp; 
 }
 
-string Transition::cppCode_cpp_transitions() {
-	if (Transition::toGoto == NULL) {
-		return "toGoto is null";
-	} else {
-		return "toGoto is not nul";
-	}
-}
+string States::cppCode_trans() {
 
+	//string code_trans;
+	//code_trans.append();
+
+	// goto SQUARE
+	// left->tran->right->right->right->left->toGoto
+	
+	// when TRUE
+	// 
+
+	return "dfs";
+}
 
 
 Platform::Platform() {}
@@ -231,12 +240,13 @@ int Transitions::getNumVarUses() {
 }
 
 int Transition::getNumVarUses() {
-    return toPerform->getNumVarUses() + eval->getNumVarUses();
+    	//return toPerform->getNumVarUses() + eval->getNumVarUses();
+    	return eval->getNumVarUses();
 }
 
 int Expr::getNumVarUses() {
     //TODO:
-    return 0;
+    return 2;
 }
 
 BinOp::~BinOp() {}
