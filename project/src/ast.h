@@ -109,21 +109,28 @@ class States : public Node {
 class Expr : public Node { //abstract
 	public:
 		Type getType();
-		virtual int getNumVarUses();
-//	private:
+		//virtual int getNumVarUses();
+		// todo
+		//virtual string cppCode_return();	
+		void cppCode_h() { return; }
 		Type t;
 };
 
 class BinOp : public Expr { //abstract, do not construct
 	public:
 		BinOp() {};
-		BinOp(Expr* left, Expr* right);
-		virtual ~BinOp() = 0;
+		BinOp(Expr *left, Expr *right, string op);
+		virtual string cppCode_return();
 		Expr* left;
 		Expr* right;
+		string op;
 		int getNumVarUses();
 };
 
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+
+/*
 class Plus : public BinOp {
 	public:
 		Plus();
@@ -179,10 +186,14 @@ class greaterThan : public BinOp{
 	public:
 		greaterThan(Expr* left, Expr* right) : BinOp(left, right) {}
 };
+*/
+
+
+////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
 
 class Constant : public Expr {
 	public:
-		//bool errorCheck(); //always OK
 		//Constant();
 };
 

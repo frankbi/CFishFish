@@ -98,6 +98,7 @@ string Program::cppCode_cpp() {
 	code_cpp.append("   runTime->run( state_" + states->left->stringname + " ); \n");
 	code_cpp.append("} \n\n");
 	code_cpp.append("// Concrete machine states \n");
+	
 	States *ptr1 = states; 
 	
 	for (int i = 0; i < count; i++) {
@@ -132,13 +133,14 @@ string Program::cppCode_cpp() {
 	code_cpp.append("  " + programName + "->go() ; \n");
 	code_cpp.append("} \n\n");
 	
+	
 	return code_cpp; 
 }
 
 
 
 string States::cppCode_expr() {
-	return "EXPREXPREXPR";
+	return "true";
 }
 
 int Decls::getNumVarDecls() {
@@ -268,7 +270,7 @@ Transitions::Transitions(Transition *tran, Transitions *next) : left(tran), righ
 
 // BINOP /////////////////
 
-BinOp::~BinOp() {}
+//BinOp::~BinOp()
 
 // VARIABLEUSE ///////////
 
@@ -278,8 +280,9 @@ VariableUse::VariableUse(string s) : name(s) {}
 
 // EXPR AND CHILDREN /////
 
-BinOp::BinOp(Expr* l, Expr* r) : left(l), right(r) {}
+BinOp::BinOp(Expr *l, Expr *r, string s) : left(l), right(r), op(s) {}
 
+/*
 Plus::Plus() {}
 //Plus::Plus(Expr* l, Expr* r) { left = l; right = r;}
 
@@ -291,7 +294,7 @@ Minus::Minus() {}
 
 Div::Div() {}
 //Div::Div(Expr* l, Expr* r) { left = l; right = r;}
-
+*/
 //void* Plus::value(){return right->value() + left->value();}
 
 

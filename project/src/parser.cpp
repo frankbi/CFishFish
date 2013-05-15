@@ -476,18 +476,22 @@ ParseResult Parser::parseNestedExpr ( ) {
     return pr ;
 }
 
+
+
 // Expr ::= Expr plusSign Expr
 ParseResult Parser::parseAddition ( ParseResult left ) {
     // parser has already matched left expression
     ParseResult pr ;
 
     match ( plusSign ) ;
+    string s = (prevToken->lexeme);
+    
     ParseResult right = parseExpr( prevToken->lbp() );
     Expr *leftexpr, *rightexpr;
     leftexpr = dynamic_cast<Expr*>(left.ast);
     rightexpr = dynamic_cast<Expr*>(right.ast);
 
-    Plus* p = new Plus(leftexpr, rightexpr);
+    BinOp* p = new BinOp(leftexpr, rightexpr, s);
     pr.ast = (Node*)p;
     return pr ;
 }
@@ -498,13 +502,15 @@ ParseResult Parser::parseMultiplication ( ParseResult left ) {
     ParseResult pr ;
 
     match ( star ) ;
+    string s = (prevToken->lexeme);
+    
     ParseResult right = parseExpr( prevToken->lbp() );
     Expr *leftexpr, *rightexpr;
     leftexpr = dynamic_cast<Expr*>(left.ast);
     rightexpr = dynamic_cast<Expr*>(right.ast);
 
 
-    Mul* m = new Mul(leftexpr, rightexpr);
+    BinOp* m = new BinOp(leftexpr, rightexpr, s);
     pr.ast = (Node*)m;
     return pr ;
 }
@@ -515,15 +521,18 @@ ParseResult Parser::parseSubtraction ( ParseResult left ) {
     ParseResult pr ;
 
     match ( dash ) ;
+    string s = (prevToken->lexeme);
+    
     ParseResult right = parseExpr( prevToken->lbp() );
     Expr *leftexpr, *rightexpr;
     leftexpr = dynamic_cast<Expr*>(left.ast);
     rightexpr = dynamic_cast<Expr*>(right.ast);
 
-    Minus* m = new Minus(leftexpr, rightexpr);
+    BinOp* m = new BinOp(leftexpr, rightexpr, s);
     pr.ast = (Node*)m;
     return pr ;
 }
+
 
 // Expr ::= Expr forwardSlash Expr
 ParseResult Parser::parseDivision ( ParseResult left ) {
@@ -531,15 +540,18 @@ ParseResult Parser::parseDivision ( ParseResult left ) {
     ParseResult pr ;
 
     match ( forwardSlash ) ;
+    string s = (prevToken->lexeme);
+    
     ParseResult right = parseExpr( prevToken->lbp() );
     Expr *leftexpr, *rightexpr;
     leftexpr = dynamic_cast<Expr*>(left.ast);
     rightexpr = dynamic_cast<Expr*>(right.ast);
 
-    Div* d = new Div(leftexpr, rightexpr);
+    BinOp *d = new BinOp(leftexpr, rightexpr, s);
     pr.ast = (Node*)d;
     return pr ;
 }
+
 
 
 // Expr ::= Expr equalEquals Expr
@@ -570,9 +582,11 @@ ParseResult Parser::parseRelationalExpr ( ParseResult left ) {
     leftexpr = dynamic_cast<Expr*>(left.ast);
     rightexpr = dynamic_cast<Expr*>(right.ast);
 
+	BinOp *e = new BinOp(leftexpr, rightexpr, op);
 
-    Expr* e;
-
+    pr.ast = (Node*)e;
+    return pr ;
+/*
     //examine the operator string
     // x ==
     if (op.compare("==") == 0) {
@@ -602,14 +616,8 @@ ParseResult Parser::parseRelationalExpr ( ParseResult left ) {
     else e = new Expr(); //dummy
     //switch and create the appropriate object
     //cast to Node and return
+*/
 
-
-
-
-
-
-    pr.ast = (Node*)e;
-    return pr ;
 }
 
 
