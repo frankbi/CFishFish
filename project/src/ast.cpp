@@ -108,14 +108,55 @@ string Program::cppCode_cpp() {
 		code_cpp.append("MachineState *State_" + ptr1->left->stringname + "::enter() { \n");
 		
 		// STMTS, EXPR
+
+
+		// Loop through. generating the transition if statements for each concrete machine state
+		
+		States *ptr2 = ptr1;		
+		while (ptr2->left->tran->left != NULL) {
+		
+			string temp = ptr2->left->tran->left->toGoto;
+			string statemachine;
+			
+			
+			if (temp == "") {
+				statemachine = "NULL";
+			} else {
+				statemachine = "stateMachine->state_" + temp;
+			}
+			
+			string output = ptr2->left->tran->left->toPerform->left->var->name;
+			
+			code_cpp.append("   if ( EXPR ) { \n");
+			code_cpp.append("      stateMachine->runTime->" + output + " = \"IN FINAL, FOUND A\" ; \n\n");
+			code_cpp.append("      return " + statemachine + ";\n");
+			//code_cpp.append("      return stateMachine->state_" + state + " ;\n");
+			code_cpp.append("   } \n\n");
+			
+			
+			
+			
+			ptr2->left->tran = ptr2->left->tran->right;
+			
+		}
+
+		
+
+		//cout << states->cppCode_transitions() << endl;
+		
+		/*
 		for (int i = 0; i < states->left->tran->getNumVarUses(); i++) {
+		
 			code_cpp.append("   if ( (stateMachine->runTime->nextChar == 'a') ) { \n");
 			code_cpp.append("      stateMachine->runTime->outputBuffer = \"FRANK BI\" ; \n\n");
 			code_cpp.append("      return stateMachine->");
 			code_cpp.append(states->left->tran->left->toGoto);
 			code_cpp.append("; \n");
 			code_cpp.append("   } \n\n");
+		
 		}
+		*/
+		
 		code_cpp.append("}\n\n");
 	
 		code_cpp.append("State_" + ptr1->left->stringname + " ( " + programName + "_Machine *m ) { \n");
@@ -123,6 +164,8 @@ string Program::cppCode_cpp() {
 		code_cpp.append("}\n\n");	
 		ptr1 = ptr1->right;
 	}
+	
+	
 	
 	code_cpp.append("\n\n\n\n");
 	code_cpp.append("// A 'main' program to run the state machine.\n");
@@ -133,10 +176,28 @@ string Program::cppCode_cpp() {
 	
 	//cout << states->left->tran->getNumVarUses() << endl;
 	//cout << states->left->tran->right->right->left->toGoto << endl;
-	cout << states->left->tran->left->toPerform->left->var->name << endl;
+	//cout << states->left->tran->left->toPerform->left->var->name << endl;
+	//cout << states->left->tran->left->eval->getNumVarUses() << endl;
 	
 	return code_cpp; 
 }
+
+
+
+
+
+
+string States::cppCode_transitions() {
+	string transitions;
+
+	transitions.append("   if ( ( expr ) { \n");
+	//transitions.append("      stateMachine->runTime->" + SOMEFUNCTIONforSTMT() + " = " + SOMEFUNCTION() + " ; \n\n");
+	//transitions.append("      return stateMachine->state_" + SOMEFUNCTIONforSTATE() + " ; \n");
+	transitions.append("}\n\n");
+
+	return transitions;
+}
+
 
 
 Platform::Platform() {}

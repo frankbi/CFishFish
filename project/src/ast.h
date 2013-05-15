@@ -103,6 +103,7 @@ class States : public Node {
 		int getNumStates();
 		int getNumVarUses();
 		string cppCode_states();
+		string cppCode_transitions();
 };
 
 class Expr : public Node { //abstract
