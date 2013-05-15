@@ -77,142 +77,68 @@ string Program::cppCode_h() {
 
 
 string Program::cppCode_cpp() { 
-
 	int count = states->getNumStates();
-	
 	string code_cpp;
 	code_cpp.append("// Generated Machine.cpp for " + programName + " \n\n");
-	
 	code_cpp.append("#include \"Machine.h\" \n");
 	code_cpp.append("using namespace std ; \n");
-	code_cpp.append(programName + "_Machine::" + programName + "_Machine (int argc, char **argv) {");
+	code_cpp.append(programName + "_Machine::" + programName + "_Machine (int argc, char **argv) { \n");
 	code_cpp.append("   runTime = new " + platform->platformName + "(argc, argv) ; \n");
-	code_cpp.append("// Creating state objects \n");
+	code_cpp.append("   // Creating state objects \n");
 	
 	States *ptr = states;
+
 	for (int i = 0; i < count; i++) {
 		code_cpp.append("   state_" + ptr->left->stringname + " = new State_" + ptr->left->stringname + "(this) ; \n");
 		ptr = ptr->right;
 	}
 	
 	code_cpp.append("} \n\n");
-	
 	code_cpp.append("void " + programName + "_Machine::go() {\n");
 	code_cpp.append("   runTime->run( state_" + states->left->stringname + " ); \n");
 	code_cpp.append("} \n\n");
-	
 	code_cpp.append("// Concrete machine states \n");
-	
 	States *ptr1 = states; 
+	
 	for (int i = 0; i < count; i++) {
 		code_cpp.append("MachineState *State_" + ptr1->left->stringname + "::enter() { \n");
-		
-		// STMTS, EXPR
-
-
-		// Loop through. generating the transition if statements for each concrete machine state
-		
 		States *ptr2 = ptr1;		
-		while (ptr2->left->tran->left != NULL) {
 		
+		while (ptr2->left->tran->left != NULL) {
 			string temp = ptr2->left->tran->left->toGoto;
 			string statemachine;
 			
-			
-			if (temp == "") {
-				statemachine = "NULL";
-			} else {
-				statemachine = "stateMachine->state_" + temp;
-			}
+			if (temp == "") statemachine = "NULL ;   } \n\n";
+			else statemachine = "stateMachine->state_" + temp + " ;   \n   } \n\n";
 			
 			string output = ptr2->left->tran->left->toPerform->left->var->name;
-			
-			code_cpp.append("   if ( EXPR ) { \n");
-			code_cpp.append("      stateMachine->runTime->" + output + " = \"IN FINAL, FOUND A\" ; \n\n");
-			code_cpp.append("      return " + statemachine + ";\n");
-			//code_cpp.append("      return stateMachine->state_" + state + " ;\n");
-			code_cpp.append("   } \n\n");
-			
-			
-			
-			
-			ptr2->left->tran = ptr2->left->tran->right;
-			
+			code_cpp.append("   if ( " + states->cppCode_expr() + " ) { \n");
+			code_cpp.append("      stateMachine->runTime->" + output + " = \"" + states->cppCode_expr() + "\" ; \n\n");
+			code_cpp.append("      return " + statemachine);
+			ptr2->left->tran = ptr2->left->tran->right;	
 		}
-
-		
-
-		//cout << states->cppCode_transitions() << endl;
-		
-		/*
-		for (int i = 0; i < states->left->tran->getNumVarUses(); i++) {
-		
-			code_cpp.append("   if ( (stateMachine->runTime->nextChar == 'a') ) { \n");
-			code_cpp.append("      stateMachine->runTime->outputBuffer = \"FRANK BI\" ; \n\n");
-			code_cpp.append("      return stateMachine->");
-			code_cpp.append(states->left->tran->left->toGoto);
-			code_cpp.append("; \n");
-			code_cpp.append("   } \n\n");
-		
-		}
-		*/
 		
 		code_cpp.append("}\n\n");
-	
-		code_cpp.append("State_" + ptr1->left->stringname + " ( " + programName + "_Machine *m ) { \n");
+		code_cpp.append("State_" + ptr1->left->stringname + "::State_" + ptr1->left->stringname + " ( " + programName + "_Machine *m ) { \n");
 		code_cpp.append("   stateMachine = m ; \n");
-		code_cpp.append("}\n\n");	
+		code_cpp.append("}\n\n\n");	
 		ptr1 = ptr1->right;
 	}
 	
-	
-	
-	code_cpp.append("\n\n\n\n");
+	code_cpp.append("\n\n");
 	code_cpp.append("// A 'main' program to run the state machine.\n");
 	code_cpp.append("int main (int argc, char **argv) { \n");
 	code_cpp.append("  " + programName + "_Machine *" + programName + " = new " + programName + "_Machine (argc, argv) ; \n");
 	code_cpp.append("  " + programName + "->go() ; \n");
 	code_cpp.append("} \n\n");
 	
-	//cout << states->left->tran->getNumVarUses() << endl;
-	//cout << states->left->tran->right->right->left->toGoto << endl;
-	//cout << states->left->tran->left->toPerform->left->var->name << endl;
-	//cout << states->left->tran->left->eval->getNumVarUses() << endl;
-	
 	return code_cpp; 
 }
 
 
 
-
-
-
-string States::cppCode_transitions() {
-	string transitions;
-
-	transitions.append("   if ( ( expr ) { \n");
-	//transitions.append("      stateMachine->runTime->" + SOMEFUNCTIONforSTMT() + " = " + SOMEFUNCTION() + " ; \n\n");
-	//transitions.append("      return stateMachine->state_" + SOMEFUNCTIONforSTATE() + " ; \n");
-	transitions.append("}\n\n");
-
-	return transitions;
-}
-
-
-
-Platform::Platform() {}
-
-Platform::Platform(string name) : platformName(name) {}
-
-Decl::Decl() {}
-
-Decl::Decl(Type t, string s) : declType(t), variableName(s) {}
-
-Decls::Decls() : left(NULL), right(NULL) {}
-
-Decls::Decls(Decl* left, Decls* right) {
-	this->left = left;
-	this->right = right;
+string States::cppCode_expr() {
+	return "EXPREXPREXPR";
 }
 
 int Decls::getNumVarDecls() {
@@ -224,13 +150,10 @@ int Decls::getNumVarDecls() {
     return sum;
 }
 
-State::State() : tran(NULL) {}
-
-State::State(Transitions* t, string s) : tran(t), stringname(s) { assert(tran != NULL); }
-
-States::States() : left(NULL), right(NULL) {}
-
-States::States(State* st, States* next) : left(st), right(next) {}
+Decls::Decls(Decl* left, Decls* right) {
+	this->left = left;
+	this->right = right;
+}
 
 int States::getNumStates() {
     int sum = 0;
@@ -240,26 +163,6 @@ int States::getNumStates() {
     }
     return sum;
 }
-
-Stmt::Stmt() {} //dummy
-
-Stmt::Stmt(Expr *e, VariableUse *v) : expr(e), var(v) {}
-
-Stmts::Stmts() : left(NULL), right(NULL) {}
-
-Stmts::Stmts(Stmt *s, Stmts *next) : left(s), right(next) {}
-
-
-Transition::Transition() {}
-
-Transition::Transition(Stmts *toperf, Expr *toeval) : toPerform(toperf), eval(toeval), toGoto("") {}
-
-Transition::Transition(string go_to, Stmts *toperf, Expr *toeval) : toPerform(toperf), eval(toeval), toGoto(go_to) {}
-
-Transitions::Transitions() : left(NULL), right(NULL) {}
-
-Transitions::Transitions(Transition *tran, Transitions *next) : left(tran), right(next) {}
-
 
 int Stmt::getNumVarUses() {
 	return expr->getNumVarUses() + var->getNumVarUses();
@@ -298,11 +201,8 @@ int Transition::getNumVarUses() {
 }
 
 int Expr::getNumVarUses() {
-    //TODO:
     return 0;
 }
-
-BinOp::~BinOp() {}
 
 int BinOp::getNumVarUses() { // OVERRIDE
     if (left != NULL && right != NULL)
@@ -314,38 +214,96 @@ int VariableUse::getNumVarUses() {
 	return 1; 
 }
 
+
+
+/////////////////////////////////////
+//        Initializer Lists
+/////////////////////////////////////
+
+
+// PLATFORM //////////////
+Platform::Platform() {}
+
+Platform::Platform(string name) : platformName(name) {}
+
+// DECLARATIONS //////////
+
+Decl::Decl() {}
+
+Decl::Decl(Type t, string s) : declType(t), variableName(s) {}
+
+Decls::Decls() : left(NULL), right(NULL) {}
+
+// STATES ////////////////
+
+State::State() : tran(NULL) {}
+
+State::State(Transitions* t, string s) : tran(t), stringname(s) { assert(tran != NULL); }
+
+States::States() : left(NULL), right(NULL) {}
+
+States::States(State* st, States* next) : left(st), right(next) {}
+
+// STATEMENTS ////////////
+
+Stmt::Stmt() {}
+
+Stmt::Stmt(Expr *e, VariableUse *v) : expr(e), var(v) {}
+
+Stmts::Stmts() : left(NULL), right(NULL) {}
+
+Stmts::Stmts(Stmt *s, Stmts *next) : left(s), right(next) {}
+
+// TRANSITIONS ///////////
+
+Transition::Transition() {}
+
+Transition::Transition(Stmts *toperf, Expr *toeval) : toPerform(toperf), eval(toeval), toGoto("") {}
+
+Transition::Transition(string go_to, Stmts *toperf, Expr *toeval) : toPerform(toperf), eval(toeval), toGoto(go_to) {}
+
+Transitions::Transitions() : left(NULL), right(NULL) {}
+
+Transitions::Transitions(Transition *tran, Transitions *next) : left(tran), right(next) {}
+
+// BINOP /////////////////
+
+BinOp::~BinOp() {}
+
+// VARIABLEUSE ///////////
+
 VariableUse::VariableUse() { name = ""; }
 
 VariableUse::VariableUse(string s) : name(s) {}
 
-//Expr and children
+// EXPR AND CHILDREN /////
 
 BinOp::BinOp(Expr* l, Expr* r) : left(l), right(r) {}
 
-Plus::Plus(){}//dummy
+Plus::Plus() {}
 //Plus::Plus(Expr* l, Expr* r) { left = l; right = r;}
 
-Mul::Mul(){}//dummy
+Mul::Mul() {}
 //Mul::Mul(Expr* l, Expr* r) { left = l; right = r;}
 
-Minus::Minus(){} //dummy
+Minus::Minus() {}
 //Minus::Minus(Expr* l, Expr* r) { left = l; right = r;}
 
-Div::Div(){} //dummy
+Div::Div() {}
 //Div::Div(Expr* l, Expr* r) { left = l; right = r;}
 
 //void* Plus::value(){return right->value() + left->value();}
 
 
-BoolConst::BoolConst(bool b) {val = b;}
+BoolConst::BoolConst(bool b) { val = b; }
 
-IntConst::IntConst(int x) {val = x;}
+IntConst::IntConst(int x) { val = x; }
 
-FloatConst::FloatConst(float x) {val = x;}
+FloatConst::FloatConst(float x) { val = x; }
 
-CharConst::CharConst(char c){val = c;}
+CharConst::CharConst(char c) { val = c; }
 
-StringConst::StringConst(string s) {val = s;}
+StringConst::StringConst(string s) { val = s; }
 
 /*
 void* VariableUse::value(){return NULL;}

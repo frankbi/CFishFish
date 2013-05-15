@@ -435,7 +435,7 @@ ParseResult Parser::parseFloatConst ( ) {
     ParseResult pr ;
     match ( floatConst ) ;
     float x;
-    istringstream(prevToken->lexeme) >>x;
+    istringstream(prevToken->lexeme) >> x;
     pr.ast = new FloatConst(x);
     return pr ;
 }

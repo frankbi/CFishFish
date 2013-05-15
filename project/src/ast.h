@@ -45,9 +45,9 @@ class Program : public Node {
 		string cppCode_cpp();
 	protected:
 		string programName;
-		Platform* platform;
-		Decls* decls;
-		States* states;
+		Platform *platform;
+		Decls *decls;
+		States *states;
 };
 
 class Platform : public Node {
@@ -103,7 +103,7 @@ class States : public Node {
 		int getNumStates();
 		int getNumVarUses();
 		string cppCode_states();
-		string cppCode_transitions();
+		string cppCode_expr();
 };
 
 class Expr : public Node { //abstract
@@ -215,7 +215,7 @@ class StringConst : public Constant{
 	public:
 		StringConst(string s);
 		//void* value();
-	private:
+//	private:
 		string val;
 };
 
