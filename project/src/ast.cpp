@@ -132,20 +132,6 @@ string Program::cppCode_cpp() {
 	return code_cpp; 
 }
 
-string States::cppCode_trans() {
-
-	//string code_trans;
-	//code_trans.append();
-
-	// goto SQUARE
-	// left->tran->right->right->right->left->toGoto
-	
-	// when TRUE
-	// 
-
-	return "dfs";
-}
-
 
 Platform::Platform() {}
 
@@ -240,13 +226,12 @@ int Transitions::getNumVarUses() {
 }
 
 int Transition::getNumVarUses() {
-    	//return toPerform->getNumVarUses() + eval->getNumVarUses();
-    	return eval->getNumVarUses();
+    	return toPerform->getNumVarUses() + eval->getNumVarUses();
 }
 
 int Expr::getNumVarUses() {
     //TODO:
-    return 2;
+    return 0;
 }
 
 BinOp::~BinOp() {}
