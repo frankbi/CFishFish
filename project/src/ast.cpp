@@ -108,10 +108,15 @@ string Program::cppCode_cpp() {
 		code_cpp.append("MachineState *State_" + ptr1->left->stringname + "::enter() { \n");
 		
 		// STMTS, EXPR
-		
-		
-		
-		code_cpp.append("\n\n\n}\n\n");
+		for (int i = 0; i < states->left->tran->getNumVarUses(); i++) {
+			code_cpp.append("   if ( (stateMachine->runTime->nextChar == 'a') ) { \n");
+			code_cpp.append("      stateMachine->runTime->outputBuffer = \"FRANK BI\" ; \n\n");
+			code_cpp.append("      return stateMachine->");
+			code_cpp.append(states->left->tran->left->toGoto);
+			code_cpp.append("; \n");
+			code_cpp.append("   } \n\n");
+		}
+		code_cpp.append("}\n\n");
 	
 		code_cpp.append("State_" + ptr1->left->stringname + " ( " + programName + "_Machine *m ) { \n");
 		code_cpp.append("   stateMachine = m ; \n");
@@ -126,8 +131,9 @@ string Program::cppCode_cpp() {
 	code_cpp.append("  " + programName + "->go() ; \n");
 	code_cpp.append("} \n\n");
 	
-	cout << states->left->tran->right->left->getNumVarUses() << endl;
-	//cout << states->left->tran->left->eval << endl;
+	//cout << states->left->tran->getNumVarUses() << endl;
+	//cout << states->left->tran->right->right->left->toGoto << endl;
+	cout << states->left->tran->left->toPerform->left->var->name << endl;
 	
 	return code_cpp; 
 }
@@ -176,22 +182,22 @@ int States::getNumStates() {
 
 Stmt::Stmt() {} //dummy
 
-Stmt::Stmt(Expr* e, VariableUse* v) : expr(e), var(v) {}
+Stmt::Stmt(Expr *e, VariableUse *v) : expr(e), var(v) {}
 
 Stmts::Stmts() : left(NULL), right(NULL) {}
 
-Stmts::Stmts(Stmt* s, Stmts* next) : left(s), right(next) {}
+Stmts::Stmts(Stmt *s, Stmts *next) : left(s), right(next) {}
 
 
 Transition::Transition() {}
 
-Transition::Transition(Stmts* toperf, Expr* toeval) : toPerform(toperf), eval(toeval), toGoto("") {}
+Transition::Transition(Stmts *toperf, Expr *toeval) : toPerform(toperf), eval(toeval), toGoto("") {}
 
-Transition::Transition(string go_to, Stmts* toperf, Expr* toeval) : toPerform(toperf), eval(toeval), toGoto(go_to) {}
+Transition::Transition(string go_to, Stmts *toperf, Expr *toeval) : toPerform(toperf), eval(toeval), toGoto(go_to) {}
 
 Transitions::Transitions() : left(NULL), right(NULL) {}
 
-Transitions::Transitions(Transition* tran, Transitions* next) : left(tran), right(next) {}
+Transitions::Transitions(Transition *tran, Transitions *next) : left(tran), right(next) {}
 
 
 int Stmt::getNumVarUses() {
@@ -199,7 +205,7 @@ int Stmt::getNumVarUses() {
 }
 
 int Stmts::getNumVarUses() {
-	if(right != NULL) {
+	if (right != NULL) {
 		return left->getNumVarUses() + right->getNumVarUses();
 	} else {
 		return 0;
@@ -211,18 +217,19 @@ int State::getNumVarUses() {
 }
 
 int States::getNumVarUses() {
-	    if (right != NULL) {
-	    	return left->getNumVarUses() + right->getNumVarUses();
-	    } else {
-	    	return 0;
-	    }
+	if (right != NULL) {
+		return left->getNumVarUses() + right->getNumVarUses();
+	} else {
+		return 0;
+	}
 }
 
 int Transitions::getNumVarUses() {
-    if (right != NULL) {
-        return left->getNumVarUses() + right->getNumVarUses();
-    }
-    else return 0;
+	if (right != NULL) {
+		return left->getNumVarUses() + right->getNumVarUses();
+	} else {
+		return 0;
+	}
 }
 
 int Transition::getNumVarUses() {

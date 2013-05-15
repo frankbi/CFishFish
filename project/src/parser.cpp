@@ -316,7 +316,9 @@ ParseResult Parser::parseTransition () {
         match(rightCurly) ;
         match(semiColon) ;
         t = new Transition(toGoto, statements, expr);
+        
     } else {
+    
         // Transition ::= exitKwd whenKwd Expr
         //                performingKwd leftCurly Stmts rightCurly semiColon
         match(exitKwd) ;
@@ -374,7 +376,7 @@ ParseResult Parser::parseStmt () {
     ParseResult expr_result = parseExpr(0) ;
     Expr* expr = dynamic_cast<Expr*>(expr_result.ast);
     match(semiColon) ;
-	Stmt* s = new Stmt(expr, v);
+    Stmt* s = new Stmt(expr, v);
     pr.ast = (Node*)s;
     return pr ;
 }

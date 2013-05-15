@@ -233,7 +233,7 @@ class VariableUse : public Expr {
 		//bool errorCheck(); //check if previously declared or not
 		//void* value(); //always NULL, restructure maybe
 		int getNumVarUses();
-	private:
+//	private:
 		string name;
 };
 
