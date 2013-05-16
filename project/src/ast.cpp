@@ -132,10 +132,40 @@ string Program::cppCode_cpp() {
 	code_cpp.append("  " + programName + "_Machine *" + programName + " = new " + programName + "_Machine (argc, argv) ; \n");
 	code_cpp.append("  " + programName + "->go() ; \n");
 	code_cpp.append("} \n\n");
-	
+
+
+	Expr g;
+	cout << g.returntext() << endl;
 	
 	return code_cpp; 
 }
+
+
+
+
+
+int Expr::getNumVarUses() {
+    return 0;
+}
+
+string Expr::cppCode_return() {
+	return "";
+}
+
+int BinOp::getNumVarUses() { // OVERRIDE
+    if (left != NULL && right != NULL)
+    return left->getNumVarUses() + right->getNumVarUses();
+    else return 0;
+}
+
+
+int VariableUse::getNumVarUses() { 
+	return 1; 
+}
+
+
+
+
 
 
 
@@ -202,19 +232,7 @@ int Transition::getNumVarUses() {
     	return toPerform->getNumVarUses() + eval->getNumVarUses();
 }
 
-int Expr::getNumVarUses() {
-    return 0;
-}
 
-int BinOp::getNumVarUses() { // OVERRIDE
-    if (left != NULL && right != NULL)
-    return left->getNumVarUses() + right->getNumVarUses();
-    else return 0;
-}
-
-int VariableUse::getNumVarUses() { 
-	return 1; 
-}
 
 
 
@@ -282,21 +300,6 @@ VariableUse::VariableUse(string s) : name(s) {}
 
 BinOp::BinOp(Expr *l, Expr *r, string s) : left(l), right(r), op(s) {}
 
-/*
-Plus::Plus() {}
-//Plus::Plus(Expr* l, Expr* r) { left = l; right = r;}
-
-Mul::Mul() {}
-//Mul::Mul(Expr* l, Expr* r) { left = l; right = r;}
-
-Minus::Minus() {}
-//Minus::Minus(Expr* l, Expr* r) { left = l; right = r;}
-
-Div::Div() {}
-//Div::Div(Expr* l, Expr* r) { left = l; right = r;}
-*/
-//void* Plus::value(){return right->value() + left->value();}
-
 
 BoolConst::BoolConst(bool b) { val = b; }
 
@@ -309,9 +312,24 @@ CharConst::CharConst(char c) { val = c; }
 StringConst::StringConst(string s) { val = s; }
 
 /*
+Plus::Plus() {}
+//Plus::Plus(Expr* l, Expr* r) { left = l; right = r;}
+
+Mul::Mul() {}
+//Mul::Mul(Expr* l, Expr* r) { left = l; right = r;}
+
+Minus::Minus() {}
+//Minus::Minus(Expr* l, Expr* r) { left = l; right = r;}
+
+Div::Div() {}
+//Div::Div(Expr* l, Expr* r) { left = l; right = r;}
+
+//void* Plus::value(){return right->value() + left->value();}
+
 void* VariableUse::value(){return NULL;}
 void* BoolConst::value(){return &val;}
 void* IntConst::value(){return &val;}
 void* FloatConst::value(){return &val;}
 void* CharConst::value(){return &val;}
-void* StringConst::value(){return &val;}*/
+void* StringConst::value(){return &val;}
+*/

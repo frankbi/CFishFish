@@ -212,13 +212,14 @@ public:
         TS_ASSERT_EQUALS(a.getNumVarUses(), 1);
     }
 
-    Plus* plus;
-    Mul* m;
+    BinOp *plus;
+    BinOp *m;
+    string operand;
 
     void test_BinOp_getNumVarUses(){
-        plus = new Plus(&a, &b);
+        plus = new BinOp(&a, &b, operand);
         TS_ASSERT_EQUALS(plus->getNumVarUses(), 2);    //for this one needed to create the constructor for Plus and fix errors with BinOp being abstract
-        m = new Mul(plus, &c);
+        m = new BinOp(plus, &c, operand);
         TS_ASSERT_EQUALS(m->getNumVarUses(), 3);    //wrote Mul constructor
                 //NOTE: can we use BinOp's constructor instead? They all do the same thing
     }

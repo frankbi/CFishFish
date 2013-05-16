@@ -109,10 +109,9 @@ class States : public Node {
 class Expr : public Node { //abstract
 	public:
 		Type getType();
-		//virtual int getNumVarUses();
-		// todo
-		//virtual string cppCode_return();	
-		void cppCode_h() { return; }
+		virtual int getNumVarUses();
+		virtual string cppCode_return();
+		virtual string returntext() { return "FRANK"; }
 		Type t;
 };
 
@@ -120,84 +119,40 @@ class BinOp : public Expr { //abstract, do not construct
 	public:
 		BinOp() {};
 		BinOp(Expr *left, Expr *right, string op);
-		virtual string cppCode_return();
-		Expr* left;
-		Expr* right;
+		Expr *left;
+		Expr *right;
 		string op;
-		int getNumVarUses();
+		 int getNumVarUses();
+		 string cppCode_return() { return "CHOPS"; }
+		 string returntext() { return "CHOPS"; }
 };
 
-//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
+
+class VariableUse : public Expr {
+	public:
+		VariableUse(); //dummy
+		VariableUse(string s);
+		//bool errorCheck(); //check if previously declared or not
+		//void* value(); //always NULL, restructure maybe
+		virtual int getNumVarUses();
+
+		string name;
+};
+
+
 
 /*
-class Plus : public BinOp {
-	public:
-		Plus();
-		Plus(Expr* left, Expr* right)  : BinOp(left, right) {};
-};
-
-class Minus : public BinOp {
-	public:
-		Minus();
-		Minus(Expr* left, Expr* right)  : BinOp(left, right) {};
-};
-
-class Mul : public BinOp {
-	public:
-		Mul();
-		Mul(Expr* left, Expr* right)  : BinOp(left, right) {};
-};
-
-class Div : public BinOp {
-	public:
-		Div();
-		Div(Expr* left, Expr* right)  : BinOp(left, right) {};
-};
-
-class equalEquals : public BinOp{
-	public:
-		equalEquals(Expr* left, Expr* right) : BinOp(left, right) {}
-};
-
-class lThanEquals : public BinOp{ //FIXME:
-	public:
-		lThanEquals(Expr* left, Expr* right) : BinOp(left, right) {}
-};
-
-class gThanEquals : public BinOp{ //FIXME:
-	public:
-		gThanEquals(Expr* left, Expr* right) : BinOp(left, right) {}
-};
-
-class nEquals : public BinOp{ //FIXME:
-	public:
-		nEquals(Expr* left, Expr* right) : BinOp(left, right) {}
-};
-
-
-class lessThan : public BinOp{
-	public:
-		lessThan(Expr* left, Expr* right) : BinOp(left, right) {}
-};
-
-
-class greaterThan : public BinOp{
-	public:
-		greaterThan(Expr* left, Expr* right) : BinOp(left, right) {}
-};
-*/
-
-
-////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-
 class Constant : public Expr {
 	public:
 		//Constant();
 };
+*/
 
-class IntConst : public Constant {
+
+
+
+
+class IntConst : public Expr {
 	public:
 		IntConst(int x);
 		//void* value();
@@ -205,7 +160,7 @@ class IntConst : public Constant {
 		int val;
 };
 
-class FloatConst : public Constant {
+class FloatConst : public Expr {
 	public:
 		FloatConst(float f);
 		//void* value();
@@ -214,7 +169,7 @@ class FloatConst : public Constant {
 };
 
 
-class CharConst : public Constant{
+class CharConst : public Expr {
 	public:
 		CharConst(char c);
 		//void* value();
@@ -222,7 +177,7 @@ class CharConst : public Constant{
 		char val;
 };
 
-class StringConst : public Constant{
+class StringConst : public Expr {
 	public:
 		StringConst(string s);
 		//void* value();
@@ -230,7 +185,7 @@ class StringConst : public Constant{
 		string val;
 };
 
-class BoolConst : public Constant {
+class BoolConst : public Expr {
 	public:
 		BoolConst(bool b);
 		//void* value();
@@ -238,16 +193,6 @@ class BoolConst : public Constant {
 		bool val;
 };
 
-class VariableUse : public Expr {
-	public:
-		VariableUse(); //dummy
-		VariableUse(string s);
-		//bool errorCheck(); //check if previously declared or not
-		//void* value(); //always NULL, restructure maybe
-		int getNumVarUses();
-//	private:
-		string name;
-};
 
 /*///////////////////////////////////////////////////////////////
 	STATEMENTS
@@ -256,10 +201,10 @@ class VariableUse : public Expr {
 
 class Stmt : public Node {
 	public:
-		Stmt(); //dummy
+		Stmt();
 		Stmt(Expr* expr, VariableUse* var);
 		int getNumVarUses();
-//	private:
+
 		Expr* expr; //required
 		VariableUse* var; //required
 		Type* t; //required
@@ -271,7 +216,7 @@ class Stmts : public Node {
 		Stmts(Stmt* s);
 		Stmts(Stmt* s, Stmts* next);
 		int getNumVarUses();
-//	private:
+
 		Stmt* left;
 		Stmts* right;
 };
@@ -286,7 +231,7 @@ class Transition : public Node {
 		Transition(Stmts*, Expr*); //when exiting
 		Transition(string, Stmts*, Expr*); //normal case
 		int getNumVarUses();
-//	private:
+
 		Stmts *toPerform;
 		Expr *eval;
 		string toGoto; //optional, if empty just exit
@@ -298,10 +243,92 @@ class Transitions : public Node {
 		Transitions();
 		Transitions(Transition* tr, Transitions* next);
 		int getNumVarUses();
-//	private:
+
 		Transition* left;
 		Transitions* right;
 };
 
 
 #endif // AST_H_INCLUDED
+
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+
+/*
+class Plus : public BinOp {
+	public:
+		Plus();
+
+		Plus(Expr* left, Expr* right)  : BinOp(left, right) {};
+
+};
+
+class Minus : public BinOp {
+
+	public:
+
+		Minus();
+
+		Minus(Expr* left, Expr* right)  : BinOp(left, right) {};
+
+};
+
+class Mul : public BinOp {
+	public:
+
+		Mul();
+		Mul(Expr* left, Expr* right)  : BinOp(left, right) {};
+};
+
+
+class Div : public BinOp {
+	public:
+		Div();
+		Div(Expr* left, Expr* right)  : BinOp(left, right) {};
+
+};
+
+class equalEquals : public BinOp{
+	public:
+
+		equalEquals(Expr* left, Expr* right) : BinOp(left, right) {}
+};
+
+class lThanEquals : public BinOp{ //FIXME:
+
+	public:
+		lThanEquals(Expr* left, Expr* right) : BinOp(left, right) {}
+};
+
+
+class gThanEquals : public BinOp{ //FIXME:
+	public:
+		gThanEquals(Expr* left, Expr* right) : BinOp(left, right) {}
+};
+
+
+class nEquals : public BinOp{ //FIXME:
+	public:
+		nEquals(Expr* left, Expr* right) : BinOp(left, right) {}
+
+};
+
+
+class lessThan : public BinOp{
+
+	public:
+		lessThan(Expr* left, Expr* right) : BinOp(left, right) {}
+};
+
+
+
+class greaterThan : public BinOp{
+	public:
+		greaterThan(Expr* left, Expr* right) : BinOp(left, right) {}
+
+};
+*/
+
+
+////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////

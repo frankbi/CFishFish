@@ -484,7 +484,7 @@ ParseResult Parser::parseAddition ( ParseResult left ) {
     ParseResult pr ;
 
     match ( plusSign ) ;
-    string s = (prevToken->lexeme);
+    string s = prevToken->lexeme;
     
     ParseResult right = parseExpr( prevToken->lbp() );
     Expr *leftexpr, *rightexpr;
@@ -502,7 +502,7 @@ ParseResult Parser::parseMultiplication ( ParseResult left ) {
     ParseResult pr ;
 
     match ( star ) ;
-    string s = (prevToken->lexeme);
+    string s = prevToken->lexeme;
     
     ParseResult right = parseExpr( prevToken->lbp() );
     Expr *leftexpr, *rightexpr;
@@ -510,7 +510,7 @@ ParseResult Parser::parseMultiplication ( ParseResult left ) {
     rightexpr = dynamic_cast<Expr*>(right.ast);
 
 
-    BinOp* m = new BinOp(leftexpr, rightexpr, s);
+    BinOp *m = new BinOp(leftexpr, rightexpr, s);
     pr.ast = (Node*)m;
     return pr ;
 }
@@ -521,7 +521,7 @@ ParseResult Parser::parseSubtraction ( ParseResult left ) {
     ParseResult pr ;
 
     match ( dash ) ;
-    string s = (prevToken->lexeme);
+    string s = prevToken->lexeme;
     
     ParseResult right = parseExpr( prevToken->lbp() );
     Expr *leftexpr, *rightexpr;
@@ -540,7 +540,7 @@ ParseResult Parser::parseDivision ( ParseResult left ) {
     ParseResult pr ;
 
     match ( forwardSlash ) ;
-    string s = (prevToken->lexeme);
+    string s = prevToken->lexeme;
     
     ParseResult right = parseExpr( prevToken->lbp() );
     Expr *leftexpr, *rightexpr;
